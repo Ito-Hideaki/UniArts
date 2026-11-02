@@ -4,7 +4,7 @@ export const commonStream: { [k: string]: InstStream } = {
     "draw": {
         body: [
             {
-                type: "save_as",
+                type: "save",
                 target: {
                     type: "top",
                     max: 1,
