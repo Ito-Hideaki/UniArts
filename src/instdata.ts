@@ -1,4 +1,4 @@
-import type { InstStream } from "./effect";
+import type { InstStream } from "./inst";
 
 export const commonStream: { [k: string]: InstStream } = {
     "draw": {

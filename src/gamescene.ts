@@ -5,9 +5,9 @@ import type { Card } from "./abstracts/card";
 import { PileObject } from "./pileobject";
 import { createPiles } from "./pilesdata";
 import { BoardWindow } from "./abstracts/boardwindow";
-import { InstStreamManager } from "./effectexecutor";
+import { InstStreamManager } from "./instexecutor";
 import { addCardTextureFrames } from "./cardtexture";
-import * as effectData from "./effectdata";
+import * as effectData from "./instdata";
 
 export class GameScene extends Phaser.Scene {
 
