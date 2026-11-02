@@ -1,6 +1,6 @@
-import type { EffectStream } from "./effect";
+import type { InstStream } from "./effect";
 
-export const commonStream: { [k: string]: EffectStream } = {
+export const commonStream: { [k: string]: InstStream } = {
     "draw": {
         body: [
             {

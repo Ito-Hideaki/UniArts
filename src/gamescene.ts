@@ -5,7 +5,7 @@ import type { Card } from "./abstracts/card";
 import { PileObject } from "./pileobject";
 import { createPiles } from "./pilesdata";
 import { BoardWindow } from "./abstracts/boardwindow";
-import { EffectExecutor, EffectStreamManager } from "./effectexecutor";
+import { InstStreamManager } from "./effectexecutor";
 import { addCardTextureFrames } from "./cardtexture";
 import * as effectData from "./effectdata";
 
@@ -35,8 +35,8 @@ export class GameScene extends Phaser.Scene {
             this.addPileObject(pileObjects[key]);
         }
         const boardWindow = new BoardWindow(board);
-        const effectStreamManager = new EffectStreamManager(this, board, boardWindow);
-        this.events.on("update", () => { effectStreamManager.progress(); });
+        const instStreamManager = new InstStreamManager(this, board, boardWindow);
+        this.events.on("update", () => { instStreamManager.progress(); });
 
         for(let i = 0; i < 10; i++) {
             const card: Card = board.createCard({ name: "foo" }, { isFront: false });
@@ -48,7 +48,7 @@ export class GameScene extends Phaser.Scene {
 
         this.input.keyboard?.on("keydown", (e: KeyboardEvent) => {
             if(e.key.toLowerCase() === "k") {
-                effectStreamManager.executeStream({
+                instStreamManager.executeStream({
                     body: [{
                         type: "for",
                         repeat: 3,
