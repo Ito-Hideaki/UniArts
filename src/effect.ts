@@ -68,6 +68,19 @@ export const CONTROL_TYPES: ControlType[keyof ControlType]["type"][] = [
 ];
 export type Inst = Effect | Control;
 
+export function isEffect(inst: Inst): inst is Effect {
+    for(const type of EFFECT_TYPES) {
+        if(type === inst.type) return true;
+    }
+    return false;
+}
+export function isControl(inst: Inst): inst is Control {
+    for(const type of CONTROL_TYPES) {
+        if(type === inst.type) return true;
+    }
+    return false;
+}
+
 export interface InstStream {
     body: Inst[];
 }
