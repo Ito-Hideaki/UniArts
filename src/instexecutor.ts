@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isControl, isEffect, type Control, type Effect, type EffectType, type Inst, type InstStream, type Selector } from "./effect";
+import { isControl, isEffect, type Control, type Effect, type EffectType, type Inst, type InstStream, type Selector } from "./inst";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
