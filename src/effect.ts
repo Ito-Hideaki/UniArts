@@ -50,6 +50,13 @@ export type EffectType = {
 }
 
 export type Effect = EffectType[keyof EffectType]
+export type ControlType = {
+    Jump: {
+        type: "jump";
+        stream: InstStream;
+    }
+}
+export type Control = ControlType[keyof ControlType];
 
 export interface EffectStream {
     body: Effect[];
