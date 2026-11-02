@@ -159,7 +159,7 @@ class RunningInstStream {
             }
         } else {
             this.runningIndex++;
-            return 1;
+            return this.executeControl(inst);
         }
     }
 
@@ -167,6 +167,13 @@ class RunningInstStream {
     private executeEffect(next: Effect) {
         this.runningEffect = this.instExecutor.executeEffect(next, this) || undefined;
         return Boolean(this.runningEffect && this.runningEffect.progress());
+    }
+
+    /** @return stream that the manager will run after this control */
+    private executeControl(control: Control): RunningInstStream {
+        switch(control.type) {
+            case "jump":
+                return new RunningInstStream(this.instExecutor, control.stream);
         }
     }
 }
