@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <script type="module">
+import Phaser from "phaser";
+import { createCardTextureImage } from "/src/cardtexture";
+addEventListener("DOMContentLoaded", () => {
+    new Phaser.Game({
+        scene: {
+            create: async function() {
+                console.log(this);
+                await createCardTextureImage(this);
+                const canvas = this.textures.get("card").getCanvas();
+                document.body.appendChild(canvas);
+            }
+        }
+    });
+})
+        </script>
+    </body>
+</html>
