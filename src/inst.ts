@@ -32,7 +32,7 @@ export type EffectType = {
         isFront: boolean;
     },
     SaveAs: {
-        type: "save_as";
+        type: "save";
         target: Selector;
         key: string | number;
     },
@@ -58,7 +58,7 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "flip",
     "for",
     "move",
-    "save_as",
+    "save",
     "test",
     "timeout"
 ];
