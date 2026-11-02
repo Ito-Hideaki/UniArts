@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 export default defineConfig(({ command }) => {
     if (command === "build") return {
-        base: "/uniarts/",
+        base: "/UniArts/",
         resolve: {
             alias: {
                 "phaser": resolve("./src/phaser-shim.js")
