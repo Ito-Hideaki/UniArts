@@ -54,7 +54,18 @@ export type ControlType = {
         stream: InstStream;
     }
 }
+export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
+    "flip",
+    "for",
+    "move",
+    "save_as",
+    "test",
+    "timeout"
+];
 export type Control = ControlType[keyof ControlType];
+export const CONTROL_TYPES: ControlType[keyof ControlType]["type"][] = [
+    "jump"
+];
 export type Inst = Effect | Control;
 
 export interface InstStream {
