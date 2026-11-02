@@ -8,6 +8,7 @@ import { BoardWindow } from "./abstracts/boardwindow";
 import { InstStreamManager } from "./instexecutor";
 import { addCardTextureFrames } from "./cardtexture";
 import * as effectData from "./instdata";
+import { vPath } from "./util";
 
 export class GameScene extends Phaser.Scene {
 
@@ -19,7 +20,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("card", "/image/card.png");
+        this.load.image("card", vPath("/image/card.png"));
         this.load.once("complete", () => {
             const cardTexture = this.textures.get("card");
             addCardTextureFrames(cardTexture);
