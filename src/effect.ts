@@ -1,5 +1,3 @@
-import type { Card } from "./abstracts/card";
-
 export type SelectorType = {
     Pile: {
         type: "pile";
@@ -41,7 +39,7 @@ export type EffectType = {
     For: {
         type: "for";
         repeat: number;
-        stream: EffectStream;
+        stream: InstStream;
     },
     Timeout: {
         type: "timeout";
@@ -57,7 +55,8 @@ export type ControlType = {
     }
 }
 export type Control = ControlType[keyof ControlType];
+export type Inst = Effect | Control;
 
-export interface EffectStream {
-    body: Effect[];
+export interface InstStream {
+    body: Inst[];
 }

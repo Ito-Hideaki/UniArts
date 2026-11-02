@@ -1,8 +1,8 @@
 import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
-import { CardObject, findCardObject } from "./cardobject";
-import type { Effect, EffectStream, EffectType, Selector } from "./effect";
+import { findCardObject } from "./cardobject";
+import type { Effect, EffectType, InstStream, Selector } from "./effect";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
@@ -31,24 +31,24 @@ class RunningMoveEffect extends RunningEffect {
 }
 
 class RunningForEffect extends RunningEffect {
-    running: RunningEffectStream;
+    running: RunningInstStream;
     counter;
-    effectExecutor;
+    instExecutor;
     effect;
 
-    constructor(effect: EffectType["For"], effectExecutor: EffectExecutor) {
+    constructor(effect: EffectType["For"], instExecutor: InstExecutor) {
         super();
-        this.effectExecutor = effectExecutor;
+        this.instExecutor = instExecutor;
         this.counter = 0;
         this.effect = effect;
-        this.running = new RunningEffectStream(effectExecutor, effect.stream);
+        this.running = new RunningInstStream(instExecutor, effect.stream);
     }
 
     progress(): boolean {
         while(!this.running.progress()) {
             this.counter++;
             if(this.counter >= this.effect.repeat) return false;
-            this.running = new RunningEffectStream(this.effectExecutor, this.effect.stream);
+            this.running = new RunningInstStream(this.instExecutor, this.effect.stream);
         }
         return true;
     }
@@ -68,7 +68,7 @@ class RunningTimeoutEffect extends RunningEffect {
     }
 }
 
-export class EffectExecutor {
+export class InstExecutor {
     boardWindow;
     board;
     scene;
@@ -79,7 +79,7 @@ export class EffectExecutor {
         this.scene = scene;
     }
 
-    executeEffect(effect: Effect, context: RunningEffectStream): false | RunningEffect {
+    executeEffect(effect: Effect, context: RunningInstStream): false | RunningEffect {
         try {
             switch(effect.type) {
                 case "test":
@@ -110,7 +110,7 @@ export class EffectExecutor {
         return false;
     }
 
-    selectCard(selector: Selector, context: RunningEffectStream): Card[] {
+    selectCard(selector: Selector, context: RunningInstStream): Card[] {
         switch(selector.type) {
             case "pile":
                 if(!this.board.piles[selector.pile]) return [];
@@ -124,16 +124,16 @@ export class EffectExecutor {
     }
 }
 
-class RunningEffectStream {
+class RunningInstStream {
     memory = new Map<string | number, Card[]>();
     runningIndex = 0;
     runningEffect: RunningEffect | undefined;
     stream;
-    effectExecutor;
+    instExecutor;
 
-    constructor(effectExecutor: EffectExecutor, stream: EffectStream) {
+    constructor(instExecutor: InstExecutor, stream: InstStream) {
         this.stream = stream;
-        this.effectExecutor = effectExecutor;
+        this.instExecutor = instExecutor;
     }
 
     /** @return if it's still running or not */
@@ -150,24 +150,25 @@ class RunningEffectStream {
         if (this.runningEffect) {
             return this.runningEffect.progress();
         } else {
-            const effect = this.stream.body[this.runningIndex];
-            this.runningEffect = this.effectExecutor.executeEffect(effect, this) || undefined;
+            const inst = this.stream.body[this.runningIndex];
+            if (inst.type === "jump") throw "not implemented yet";
+            this.runningEffect = this.instExecutor.executeEffect(inst, this) || undefined;
             return Boolean(this.runningEffect && this.runningEffect.progress());
         }
     }
 }
 
-export class EffectStreamManager {
-    effectExecutor;
-    running: RunningEffectStream | undefined;
+export class InstStreamManager {
+    instExecutor;
+    running: RunningInstStream | undefined;
 
     constructor(scene: GameScene, board: Board, window: BoardWindow) {
-        this.effectExecutor = new EffectExecutor(scene, board, window);
+        this.instExecutor = new InstExecutor(scene, board, window);
     }
 
-    executeStream(stream: EffectStream) {
+    executeStream(stream: InstStream) {
         if(this.running) throw "not finished previous stream yet";
-        this.running = new RunningEffectStream(this.effectExecutor, stream);
+        this.running = new RunningInstStream(this.instExecutor, stream);
     }
 
     /** @return if it's completed or not (running) */
