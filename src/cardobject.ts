@@ -21,7 +21,7 @@ export class CardObject extends Phaser.GameObjects.Image {
         scene.events.on("update", this.update, this);
     }
 
-    update(time: number, delta_ms: number) {
+    update(_: number, delta_ms: number) {
         this.updateFrame();
 
         if(this.card.pile) {
