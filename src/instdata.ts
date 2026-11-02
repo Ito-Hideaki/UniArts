@@ -1,6 +1,9 @@
 import type { InstStream } from "./inst";
 
+const NULL_STREAM: InstStream = { body: [] };
+
 export const commonStream: { [k: string]: InstStream } = {
+    null: NULL_STREAM,
     "draw": {
         body: [
             {
@@ -37,4 +40,25 @@ export const commonStream: { [k: string]: InstStream } = {
             }
         ]
     }
-}
+};
+
+export const systemStream: { [k: string]: InstStream } = {
+    deal_hands: NULL_STREAM
+};
+systemStream.start = {
+        body: [
+            {
+                type: "jump",
+                stream: systemStream.deal_hands
+            }
+        ]
+};
+Object.assign(systemStream.deal_hands, {
+    body: [
+        {
+            type: "for",
+            repeat: 3,
+            stream: commonStream.draw
+        }
+    ]
+});
