@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import type { Effect, EffectType, InstStream, Selector } from "./effect";
+import { isControl, isEffect, type Control, type Effect, type EffectType, type Inst, type InstStream, type Selector } from "./effect";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
@@ -136,24 +136,37 @@ class RunningInstStream {
         this.instExecutor = instExecutor;
     }
 
-    /** @return if it's still running or not */
-    progress(): boolean {
-        while(this.runningIndex < this.stream.body.length) {
-            if(this.isRunningAfterProgression()) return true;
-            this.runningEffect = undefined;
+    /**
+     * RunningInstStream ... completed current stream, next run this
+     *
+     * 1 ... still able to progress at this moment
+     *
+     * 2 ... unable to progress anymore at this moment
+     *
+     * undefined ... completed current stream, no more for now
+     */
+    progress(): 1 | 2 | RunningInstStream | undefined {
+        if(this.runningIndex >= this.stream.body.length) return;
+        const inst = this.stream.body[this.runningIndex];
+        if(this.runningEffect || isEffect(inst)) {
+            //@ts-ignore
+            const stillRunning = this.runningEffect ? this.runningEffect.progress() : this.executeEffect(inst);
+            if(stillRunning) {
+                return 2;
+            } else {
+                this.runningIndex++;
+                return 1;
+            }
+        } else {
             this.runningIndex++;
+            return 1;
         }
-        return false;
     }
 
-    private isRunningAfterProgression()  {
-        if (this.runningEffect) {
-            return this.runningEffect.progress();
-        } else {
-            const inst = this.stream.body[this.runningIndex];
-            if (inst.type === "jump") throw "not implemented yet";
-            this.runningEffect = this.instExecutor.executeEffect(inst, this) || undefined;
-            return Boolean(this.runningEffect && this.runningEffect.progress());
+    /** @return if the effect is still running */
+    private executeEffect(next: Effect) {
+        this.runningEffect = this.instExecutor.executeEffect(next, this) || undefined;
+        return Boolean(this.runningEffect && this.runningEffect.progress());
         }
     }
 }
@@ -173,10 +186,17 @@ export class InstStreamManager {
 
     /** @return if it's completed or not (running) */
     progress(): boolean {
-        if(!this.running) return true;
-        if (!this.running.progress()) {
-            this.running = undefined;
-            return true;
-        } else return false;
+        while(true) {
+            if(!this.running) return true;
+            const result = this.running.progress();
+            switch(result) {
+                case 1:
+                    break;
+                case 2:
+                    return false;
+                default:
+                    this.running = result;
+            }
+        }
     }
 }
