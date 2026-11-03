@@ -55,7 +55,7 @@ export class GameScene extends Phaser.Scene {
                 const cardObject = new CardObject(this, card);
                 this.add.existing(cardObject);
                 this.cards.add(cardObject);
-                boardWindow.moveCard(card, "deck");
+                boardWindow.moveCard(card, { key: "deck", player: pID });
             }
         }
 

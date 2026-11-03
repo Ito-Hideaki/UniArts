@@ -8,7 +8,7 @@ export class BoardWindow {
         this.board = board;
     }
 
-    moveCard(card: Card, to?: string) {
+    moveCard(card: Card, to?: {key: string, player?: number}) {
         this.board.moveCard(card, to);
     }
 
