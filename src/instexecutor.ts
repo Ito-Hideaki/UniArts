@@ -270,8 +270,10 @@ class RunningInstStream {
 
     /** @return if the effect is still running */
     private executeEffect(next: Effect) {
-        this.runningEffect = this.instExecutor.executeEffect(next, this) || undefined;
-        return Boolean(this.runningEffect && this.runningEffect.progress());
+        const runningEffect = this.instExecutor.executeEffect(next, this);
+        if(!runningEffect) return false;
+        this.runningEffect = runningEffect;
+        return this.runningEffect.progress();
     }
 
     /** @return stream that the manager will run after this control */
