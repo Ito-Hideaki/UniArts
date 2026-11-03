@@ -24,7 +24,7 @@ export type SelectorType = {
 export type Selector = SelectorType[keyof SelectorType];
 
 export type MemoryKey = number | string;
-export type MemoryValue = Card[];
+export type MemoryValue = Card[] | number[];
 
 export type EffectType = {
     Test: {
