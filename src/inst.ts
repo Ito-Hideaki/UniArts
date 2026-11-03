@@ -55,11 +55,6 @@ export type EffectType = {
         type: "save_player";
         target: PlayerSelector;
         key: MemoryKey;
-    }
-    For: {
-        type: "for";
-        repeat: number;
-        stream: InstStream;
     },
     Timeout: {
         type: "timeout";
@@ -82,11 +77,19 @@ export type ControlType = {
     Return: {
         type: "return";
         return?: MemoryKey;
+    },
+    Repeat: {
+        type: "repeat";
+        counter: MemoryKey;
+        times: number;
+    },
+    Close: {
+        type: "close";
+        counter: MemoryKey;
     }
 }
 export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "flip",
-    "for",
     "move",
     "save",
     "save_player",
@@ -97,7 +100,9 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
 export type Control = ControlType[keyof ControlType];
 export const CONTROL_TYPES: ControlType[keyof ControlType]["type"][] = [
     "jump",
-    "return"
+    "return",
+    "repeat",
+    "close"
 ];
 export type Inst = Effect | Control;
 

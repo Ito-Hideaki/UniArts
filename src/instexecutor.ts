@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type PlayerSelector, type Selector } from "./inst";
+import { isEffect, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type PlayerSelector, type Selector } from "./inst";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
@@ -27,30 +27,6 @@ class RunningMoveEffect extends RunningEffect {
         // const movingCard = this.cardObjects.find(cardObject => cardObject?.isMoving);
         // return Boolean(movingCard);
         return false;
-    }
-}
-
-class RunningForEffect extends RunningEffect {
-    running: RunningInstStream;
-    counter;
-    instExecutor;
-    effect;
-
-    constructor(effect: EffectType["For"], instExecutor: InstExecutor) {
-        super();
-        this.instExecutor = instExecutor;
-        this.counter = 0;
-        this.effect = effect;
-        this.running = new RunningInstStream(instExecutor, effect.stream);
-    }
-
-    progress(): boolean {
-        while(!this.running.progress()) {
-            this.counter++;
-            if(this.counter >= this.effect.repeat) return false;
-            this.running = new RunningInstStream(this.instExecutor, this.effect.stream);
-        }
-        return true;
     }
 }
 
@@ -167,8 +143,6 @@ export class InstExecutor {
                         this.boardWindow.flipCard(card, effect.isFront);
                     }
                     return false;
-                case "for":
-                    return new RunningForEffect(effect, this);
                 case "timeout":
                     return new RunningTimeoutEffect(this.scene, effect);
                 case "call":
@@ -260,6 +234,7 @@ class RunningInstStream {
             if(stillRunning) {
                 return 2;
             } else {
+                this.runningEffect = undefined;
                 this.runningIndex++;
                 return 1;
             }
@@ -288,6 +263,39 @@ class RunningInstStream {
                     this.callInfo.return(returnValue);
                 }
                 return undefined;
+            case "repeat":
+                this.numMemory.set(control.counter, 0);
+                return this;
+            case "close":
+                this.executeCloseControl(control);
+                return this;
+        }
+    }
+    private executeCloseControl(control: ControlType["Close"]): void {
+        const result = this.findRepetitionBeginning(control);
+        if(!result) {
+            console.error("couldn't found repetition beginning");
+            return;
+        }
+        const { beginning, beginningIndex } = result;
+        const count = this.numMemory.get(control.counter);
+        if(count === undefined) {
+            console.error("there was no initialized counter data");
+            return;
+        }
+        const nextCount = count + 1;
+        this.numMemory.set(control.counter, nextCount);
+        if(nextCount < beginning.times) {
+            this.runningIndex = beginningIndex + 1;
+        }
+    }
+
+    private findRepetitionBeginning(close: ControlType["Close"]) {
+        for(let i = this.stream.body.indexOf(close); i >= 0; i--) {
+            const inst = this.stream.body[i];
+            if(inst.type === "repeat" && inst.counter === close.counter) {
+                return { beginning: inst, beginningIndex: i };
+            }
         }
     }
 }
