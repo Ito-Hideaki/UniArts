@@ -49,6 +49,10 @@ export type EffectType = {
     Timeout: {
         type: "timeout";
         duration: number;
+    },
+    Call: {
+        type: "call";
+        stream: InstStream;
     }
 }
 
@@ -65,7 +69,8 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "move",
     "save",
     "test",
-    "timeout"
+    "timeout",
+    "call"
 ];
 export type Control = ControlType[keyof ControlType];
 export const CONTROL_TYPES: ControlType[keyof ControlType]["type"][] = [
