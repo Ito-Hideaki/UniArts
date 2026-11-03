@@ -15,11 +15,14 @@ export type SelectorType = {
     },
     Load: {
         type: "load";
-        key: string | number;
+        key: MemoryKey;
     }
 }
 
 export type Selector = SelectorType[keyof SelectorType];
+
+export type MemoryKey = number | string;
+export type MemoryValue = Card[];
 
 export type EffectType = {
     Test: {
@@ -39,7 +42,7 @@ export type EffectType = {
     SaveAs: {
         type: "save";
         target: Selector;
-        key: string | number;
+        key: MemoryKey;
     },
     For: {
         type: "for";
@@ -53,6 +56,8 @@ export type EffectType = {
     Call: {
         type: "call";
         stream: InstStream;
+        params: MemoryKey[];
+        saveTo?: MemoryKey;
     }
 }
 

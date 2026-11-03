@@ -168,7 +168,7 @@ export class InstExecutor {
 }
 
 class RunningInstStream {
-    memory = new Map<string | number, Card[]>();
+    memory = new Map<MemoryKey, MemoryValue>();
     runningIndex = 0;
     runningEffect: RunningEffect | undefined;
     stream;
