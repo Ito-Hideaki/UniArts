@@ -60,12 +60,26 @@ systemStream.start = {
             }
         ]
 };
+const deal_hands_draw_one: InstStream = {
+    body: [
+        {
+            type: "save_player",
+            target: 0,
+            key: "draw_from"
+        },
+        {
+            type: "call",
+            stream: commonStream.draw,
+            params: ["draw_from"]
+        }
+    ]
+};
 Object.assign(systemStream.deal_hands, {
     body: [
         {
             type: "for",
             repeat: 3,
-            stream: commonStream.draw
+            stream: deal_hands_draw_one
         }
     ]
 });
