@@ -181,7 +181,8 @@ export class InstExecutor {
                 const sourceCards = this.selectCard(selector.source, context);
                 return sourceCards.slice(-selector.max);
             case "load":
-                return context.memory.get(selector.key) ?? [];
+                const loaded = context.memory.get(selector.key) ?? [];
+                return loaded.filter(value => typeof value === "object");
         }
     }
 }
