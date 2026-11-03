@@ -1,3 +1,5 @@
+import type { Card } from "./abstracts/card";
+
 export type PileSelector = string | {
     player? : number;
     key: string;
@@ -66,6 +68,10 @@ export type ControlType = {
     Jump: {
         type: "jump";
         stream: InstStream;
+    },
+    Return: {
+        type: "return";
+        return?: MemoryKey;
     }
 }
 export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
@@ -79,7 +85,8 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
 ];
 export type Control = ControlType[keyof ControlType];
 export const CONTROL_TYPES: ControlType[keyof ControlType]["type"][] = [
-    "jump"
+    "jump",
+    "return"
 ];
 export type Inst = Effect | Control;
 
