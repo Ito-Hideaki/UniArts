@@ -68,6 +68,35 @@ class RunningTimeoutEffect extends RunningEffect {
     }
 }
 
+class RunningCallEffect extends RunningEffect {
+    subRunning;
+    private instExecutor;
+    parentMemory;
+    constructor(effect: EffectType["Call"], context: RunningInstStream) {
+        super();
+        this.parentMemory = context.memory;
+        this.instExecutor = context.instExecutor;
+        this.subRunning = new RunningInstStream(this.instExecutor, effect.stream);
+    }
+
+    progress(): boolean {
+        while(true) {
+            const result = this.subRunning.progress();
+                switch(result) {
+                case 1:
+                    break;
+                case 2:
+                    return true;
+                case undefined:
+                    return false;
+                default:
+                    this.subRunning = result;
+                    break;
+            }
+        }
+    }
+}
+
 function getObjectFromPileSelector(selector: PileSelector) {
     if(typeof selector === "string") {
         return { key: selector };
@@ -114,6 +143,8 @@ export class InstExecutor {
                     return new RunningForEffect(effect, this);
                 case "timeout":
                     return new RunningTimeoutEffect(this.scene, effect);
+                case "call":
+                    return new RunningCallEffect(effect, context);
             }
         } catch(e) {
             console.error(e);
