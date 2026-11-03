@@ -115,5 +115,6 @@ export function isControl(inst: Inst): inst is Control {
 }
 
 export interface InstStream {
+    paramAliases?: MemoryKey[];
     body: Inst[];
 }
