@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type Control, type Effect, type EffectType, type InstStream, type PileSelector, type Selector } from "./inst";
+import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type Selector } from "./inst";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
@@ -68,15 +68,34 @@ class RunningTimeoutEffect extends RunningEffect {
     }
 }
 
+type CallInfo = {
+    params: MemoryValue[]
+    return: (value?: MemoryValue) => void;
+};
+
 class RunningCallEffect extends RunningEffect {
-    subRunning;
+    subRunning: RunningInstStream;
     private instExecutor;
     parentMemory;
+    private returnFunction;
+
     constructor(effect: EffectType["Call"], context: RunningInstStream) {
         super();
         this.parentMemory = context.memory;
         this.instExecutor = context.instExecutor;
-        this.subRunning = new RunningInstStream(this.instExecutor, effect.stream);
+        this.returnFunction = (value?: MemoryValue) => {
+            if(value && effect.saveTo) this.parentMemory.set(effect.saveTo, value);
+        };
+
+        const callInfo: CallInfo = {
+            params: effect.params.map(key => {
+                const value = this.parentMemory.get(key);
+                if(value === undefined) throw `there was no param value at ${key}`;
+                return value;
+            }),
+            return: this.returnFunction
+        };
+        this.subRunning = new RunningInstStream(this.instExecutor, effect.stream, callInfo);
     }
 
     progress(): boolean {
@@ -173,10 +192,19 @@ class RunningInstStream {
     runningEffect: RunningEffect | undefined;
     stream;
     instExecutor;
+    callInfo;
 
-    constructor(instExecutor: InstExecutor, stream: InstStream) {
+    constructor(instExecutor: InstExecutor, stream: InstStream, callInfo?: CallInfo) {
         this.stream = stream;
         this.instExecutor = instExecutor;
+        this.callInfo = callInfo;
+        if(callInfo) this.getParams(callInfo);
+    }
+
+    getParams(callInfo: CallInfo) {
+        callInfo.params.forEach((param, i) => {
+            this.memory.set(`param${i}`, param);
+        });
     }
 
     /**
@@ -213,10 +241,16 @@ class RunningInstStream {
     }
 
     /** @return stream that the manager will run after this control */
-    private executeControl(control: Control): RunningInstStream {
+    private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
                 return new RunningInstStream(this.instExecutor, control.stream);
+            case "return":
+                if(this.callInfo) {
+                    const returnValue = control.return ? this.memory.get(control.return) : undefined;
+                    this.callInfo.return(returnValue);
+                }
+                return undefined;
         }
     }
 }
