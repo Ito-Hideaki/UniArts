@@ -124,7 +124,7 @@ export class InstExecutor {
     selectCard(selector: Selector, context: RunningInstStream): Card[] {
         switch(selector.type) {
             case "pile":
-                if(typeof selector.pile !== "string" && selector.pile.player) {
+                if(typeof selector.pile !== "string" && selector.pile.player !== undefined) {
                     return this.board.piles[selector.pile.player][selector.pile.key].cards;
                 } else return [];
             case "top":
