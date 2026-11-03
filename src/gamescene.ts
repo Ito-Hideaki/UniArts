@@ -49,12 +49,14 @@ export class GameScene extends Phaser.Scene {
         const instStreamManager = new InstStreamManager(this, board, boardWindow);
         this.events.on("update", () => { instStreamManager.progress(); });
 
-        for(let i = 0; i < 10; i++) {
-            const card: Card = board.createCard({ name: "foo" }, { isFront: false });
-            const cardObject = new CardObject(this, card);
-            this.add.existing(cardObject);
-            this.cards.add(cardObject);
-            boardWindow.moveCard(card, "deck");
+        for(let pID = 0; pID < this.info.playerNum; pID++) {
+            for(let i = 0; i < 10; i++) {
+                const card: Card = board.createCard({ name: "foo" }, { isFront: false });
+                const cardObject = new CardObject(this, card);
+                this.add.existing(cardObject);
+                this.cards.add(cardObject);
+                boardWindow.moveCard(card, "deck");
+            }
         }
 
         this.input.keyboard?.on("keydown", (e: KeyboardEvent) => {
