@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type Selector } from "./inst";
+import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type PlayerSelector, type Selector } from "./inst";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
@@ -144,11 +144,20 @@ export class InstExecutor {
                     const cardsToSave = this.selectCard(effect.target, context);
                     context.memory.set(effect.key, cardsToSave);
                     return false;
+                case "save_player":
+                    const players = this.selectPlayers(effect.target, context);
+                    context.memory.set(effect.key, players);
+                    return false;
                 case "move": {
                     const cards = this.selectCard(effect.target, context);
                     for(const card of cards) {
                         const to = effect.to !== undefined ? getObjectFromPileSelector(effect.to) : undefined;
-                        this.boardWindow.moveCard(card, to);
+                        if(to) {
+                            const player = to.player !== undefined ? this.selectPlayer(to.player, context) : undefined;
+                            this.boardWindow.moveCard(card, { key: to.key, player});
+                        } else {
+                            this.boardWindow.moveCard(card);
+                        }
                     }
                     return new RunningMoveEffect(this.scene, cards);
                 }
@@ -175,7 +184,12 @@ export class InstExecutor {
         switch(selector.type) {
             case "pile":
                 if(typeof selector.pile !== "string" && selector.pile.player !== undefined) {
-                    return this.board.piles[selector.pile.player][selector.pile.key].cards;
+                    const player = this.selectPlayer(selector.pile.player, context);
+                    if(player === undefined) {
+                        console.error("found no player to choose pile from");
+                        return [];
+                    }
+                    return this.board.piles[player][selector.pile.key].cards;
                 } else return [];
             case "top":
                 const sourceCards = this.selectCard(selector.source, context);
@@ -184,6 +198,21 @@ export class InstExecutor {
                 const loaded = context.memory.get(selector.key) ?? [];
                 return loaded.filter(value => typeof value === "object");
         }
+    }
+
+    selectPlayers(selector: PlayerSelector, context: RunningInstStream): number[] {
+        if (typeof selector === "number") {
+            return [selector];
+        } else if(Array.isArray(selector)) {
+            return selector;
+        } else {
+            const loaded = context.memory.get(selector.key);
+            if(!loaded) return [];
+            return loaded.filter(value => typeof value === "number");
+        }
+    }
+    selectPlayer(selector: PlayerSelector, context: RunningInstStream): number | undefined {
+        return this.selectPlayers(selector, context).at(0);
     }
 }
 

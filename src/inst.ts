@@ -1,9 +1,14 @@
 import type { Card } from "./abstracts/card";
 
 export type PileSelector = string | {
-    player? : number;
+    player? : PlayerSelector;
     key: string;
 };
+
+export type PlayerSelector = number | number[] | {
+    type: "load",
+    key: MemoryKey
+}
 
 export type SelectorType = {
     Pile: {
@@ -46,6 +51,11 @@ export type EffectType = {
         target: Selector;
         key: MemoryKey;
     },
+    SavePlayer: {
+        type: "save_player";
+        target: PlayerSelector;
+        key: MemoryKey;
+    }
     For: {
         type: "for";
         repeat: number;
@@ -79,6 +89,7 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "for",
     "move",
     "save",
+    "save_player",
     "test",
     "timeout",
     "call"
