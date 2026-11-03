@@ -5,6 +5,7 @@ const NULL_STREAM: InstStream = { body: [] };
 export const commonStream: { [k: string]: InstStream } = {
     null: NULL_STREAM,
     "draw": {
+        paramAliases: ["draw_from"],
         body: [
             {
                 type: "save",
@@ -13,7 +14,13 @@ export const commonStream: { [k: string]: InstStream } = {
                     max: 1,
                     source: {
                         type: "pile",
-                        pile: "deck"
+                        pile: {
+                            key: "deck",
+                            player: {
+                                type: "load",
+                                key: "draw_from"
+                            }
+                        }
                     }
                 },
                 key: 0

@@ -232,8 +232,12 @@ class RunningInstStream {
     }
 
     getParams(callInfo: CallInfo) {
+        const aliases = this.stream.paramAliases;
         callInfo.params.forEach((param, i) => {
             this.memory.set(`param${i}`, param);
+            if(aliases && i < aliases.length) {
+                this.memory.set(aliases[i], param);
+            }
         });
     }
 
