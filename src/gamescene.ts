@@ -3,17 +3,22 @@ import { CardObject } from "./cardobject";
 import { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
 import { PileObject } from "./pileobject";
-import { createPiles } from "./pilesdata";
+import { createPilesList } from "./pilesdata";
 import { BoardWindow } from "./abstracts/boardwindow";
 import { InstStreamManager } from "./instexecutor";
 import { addCardTextureFrames } from "./cardtexture";
 import * as effectData from "./instdata";
 import { vPath } from "./util";
+import type { GameInfo } from "./gameinfo";
+import type { Pile } from "./abstracts/pile";
 
 export class GameScene extends Phaser.Scene {
 
     piles = new Set<PileObject>();
     cards = new Set<CardObject>();
+
+    //@ts-ignore
+    info: GameInfo;
 
     constructor() {
         super("game");
@@ -28,13 +33,18 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-
-        const { piles, pileObjects } = createPiles(this);
-        const board = new Board(piles);
-        for(const key in pileObjects) {
-            //@ts-ignore
-            this.addPileObject(pileObjects[key]);
+        this.info = {
+            playerNum: 2
+        };
+        const piles: { [k: string]: Pile }[] = [];
+        for(let pID = 0; pID < this.info.playerNum; pID++) {
+            const { piles: playerPiles, pileObjects } = createPilesList[pID](this);
+            for(const pileObject of Object.values(pileObjects)) {
+                this.addPileObject(pileObject);
+            }
+            piles.push(playerPiles);
         }
+        const board = new Board(piles);
         const boardWindow = new BoardWindow(board);
         const instStreamManager = new InstStreamManager(this, board, boardWindow);
         this.events.on("update", () => { instStreamManager.progress(); });

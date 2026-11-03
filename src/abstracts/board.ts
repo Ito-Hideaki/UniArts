@@ -45,7 +45,7 @@ export class Board {
     piles;
     private event;
 
-    constructor(piles: { [k: string]: Pile }  = {}) {
+    constructor(piles: { [k: string]: Pile }[] = []) {
         this.piles = piles;
         this.event = new BoardEventEmitter();
     }
@@ -76,8 +76,8 @@ export class Board {
             const index = from.cards.indexOf(card);
             if(index !== -1) from.cards.splice(index, 1);
         }
-
-        const dest = to ? this.piles[to] : undefined;
+        const previousPID = from?.pID;
+        const dest = to && previousPID ? this.piles[previousPID][to] : undefined;
         if(dest && !dest.cards.includes(card)) dest.cards.push(card);
         card.pile = dest;
 

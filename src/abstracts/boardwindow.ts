@@ -9,7 +9,6 @@ export class BoardWindow {
     }
 
     moveCard(card: Card, to?: string) {
-        if(to && !this.board.piles[to]) throw "Invalid Operation: destination string was not valid";
         this.board.moveCard(card, to);
     }
 
