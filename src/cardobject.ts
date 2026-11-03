@@ -27,8 +27,8 @@ export class CardObject extends Phaser.GameObjects.Image {
         if(this.card.pile) {
             const dest = this.getDestinationFromPile(this.card.pile);
             if(dest) {
-                this.depth = dest.depth;
                 this.updatePosition(delta_ms, dest);
+                this.updateDepth(delta_ms, dest.depth, dest.x);
             }
         }
     }
@@ -70,6 +70,14 @@ export class CardObject extends Phaser.GameObjects.Image {
         const delta_pos = this.velocity.clone().scale(delta);
         this.x += delta_pos.x;
         this.y += delta_pos.y;
+    }
+
+    private updateDepth(delta_ms: number, destDepth: number, destX: number) {
+        if(Math.abs(this.depth - destX) < 0.5 || this.x - destX === 0) {
+            this.depth = destDepth;
+        } else {
+            this.depth += delta_ms/1000 * this.velocity.x / (this.x - destX) * (this.depth - destDepth);
+        }
     }
 
     private getDestinationFromPile(pile: Pile) {
