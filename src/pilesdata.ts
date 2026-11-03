@@ -2,18 +2,18 @@ import type { GameScene } from "./gamescene";
 import { Pile } from "./abstracts/pile";
 import { PileObject } from "./pileobject";
 
-export function createPiles(scene: GameScene) {
-    const deck = new Pile();
+function createPiles0(scene: GameScene) {
+    const deck = new Pile(0);
     const deckObject = new PileObject(scene, deck, 300, 800);
     deckObject.cardGap.y = -5;
     deckObject.cardGap.x = -10;
 
-    const hands = new Pile();
+    const hands = new Pile(0);
     const handsObject = new PileObject(scene, hands, 1000, 900);
     handsObject.cardGap.x = 100;
     handsObject.bottomAdjustment.x = 0.5;
 
-    const discarded = new Pile();
+    const discarded = new Pile(0);
     const discardedObject = new PileObject(scene, discarded, 1600, 800);
     discardedObject.cardGap.y = -5;
 
@@ -30,3 +30,34 @@ export function createPiles(scene: GameScene) {
         }
     }
 }
+
+function createPiles1(scene: GameScene) {
+    const deck = new Pile(1);
+    const deckObject = new PileObject(scene, deck, 300, 800);
+    deckObject.cardGap.y = -5;
+    deckObject.cardGap.x = -10;
+
+    const hands = new Pile(1);
+    const handsObject = new PileObject(scene, hands, 1000, 900);
+    handsObject.cardGap.x = 100;
+    handsObject.bottomAdjustment.x = 0.5;
+
+    const discarded = new Pile(1);
+    const discardedObject = new PileObject(scene, discarded, 1600, 800);
+    discardedObject.cardGap.y = -5;
+
+    return {
+        piles: {
+            deck,
+            hands,
+            discarded
+        },
+        pileObjects: {
+            deck: deckObject,
+            hands: handsObject,
+            discarded: discardedObject
+        }
+    }
+}
+
+export const createPilesList = [createPiles0, createPiles1];
