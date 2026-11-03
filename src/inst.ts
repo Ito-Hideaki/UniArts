@@ -1,7 +1,12 @@
+export type PileSelector = string | {
+    player? : number;
+    key: string;
+};
+
 export type SelectorType = {
     Pile: {
         type: "pile";
-        pile: string;
+        pile: PileSelector;
     },
     Top: {
         type: "top";
@@ -24,7 +29,7 @@ export type EffectType = {
     Move: {
         type: "move";
         target: Selector;
-        to?: string;
+        to?: PileSelector;
     },
     Flip: {
         type: "flip";

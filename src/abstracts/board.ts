@@ -1,3 +1,4 @@
+import type { PileSelector } from "../inst";
 import type { Card, CardInfo, CardState } from "./card";
 import type { Pile } from "./pile";
 
@@ -70,14 +71,18 @@ export class Board {
         return card;
     }
 
-    moveCard(card: Card, to?: string) {
+    getPile(key: string, player: number): Pile | undefined {
+        return this.piles[player] && this.piles[player][key];
+    }
+
+    moveCard(card: Card, to?: { key: string, player?: number}) {
         const from = card.pile;
         if(from) {
             const index = from.cards.indexOf(card);
             if(index !== -1) from.cards.splice(index, 1);
         }
-        const previousPID = from?.pID;
-        const dest = to && previousPID ? this.piles[previousPID][to] : undefined;
+        const targetPlayer = to?.player ?? from?.pID;
+        const dest = (to !== undefined && targetPlayer !== undefined && this.getPile(to.key, targetPlayer)) || undefined;
         if(dest && !dest.cards.includes(card)) dest.cards.push(card);
         card.pile = dest;
 

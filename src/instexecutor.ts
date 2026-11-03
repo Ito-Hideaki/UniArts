@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type Control, type Effect, type EffectType, type InstStream, type Selector } from "./inst";
+import { isEffect, type Control, type Effect, type EffectType, type InstStream, type PileSelector, type Selector } from "./inst";
 import type { GameScene } from "./gamescene";
 
 class RunningEffect {
@@ -68,6 +68,14 @@ class RunningTimeoutEffect extends RunningEffect {
     }
 }
 
+function getObjectFromPileSelector(selector: PileSelector) {
+    if(typeof selector === "string") {
+        return { key: selector };
+    } else {
+        return { key: selector.key, ...(selector.player ? { player: selector.player } : {}) }
+    }
+}
+
 export class InstExecutor {
     boardWindow;
     board;
@@ -90,7 +98,10 @@ export class InstExecutor {
                     return false;
                 case "move": {
                     const cards = this.selectCard(effect.target, context);
-                    for(const card of cards) this.boardWindow.moveCard(card, effect.to);
+                    for(const card of cards) {
+                        const to = effect.to !== undefined ? getObjectFromPileSelector(effect.to) : undefined;
+                        this.boardWindow.moveCard(card, to);
+                    }
                     return new RunningMoveEffect(this.scene, cards);
                 }
                 case "flip":
@@ -113,8 +124,9 @@ export class InstExecutor {
     selectCard(selector: Selector, context: RunningInstStream): Card[] {
         switch(selector.type) {
             case "pile":
-                if(!this.board.piles[selector.pile]) return [];
-                return this.board.piles[selector.pile].cards.slice();
+                if(typeof selector.pile !== "string" && selector.pile.player) {
+                    return this.board.piles[selector.pile.player][selector.pile.key].cards;
+                } else return [];
             case "top":
                 const sourceCards = this.selectCard(selector.source, context);
                 return sourceCards.slice(-selector.max);
