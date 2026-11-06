@@ -46,8 +46,8 @@ export type EffectType = {
         target: Selector;
         isFront: boolean;
     },
-    SaveAs: {
-        type: "save";
+    SaveCard: {
+        type: "save_card";
         target: Selector;
         key: MemoryKey;
     },
@@ -91,7 +91,7 @@ export type ControlType = {
 export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "flip",
     "move",
-    "save",
+    "save_card",
     "save_player",
     "test",
     "timeout",
