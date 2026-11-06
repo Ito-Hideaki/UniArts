@@ -4,6 +4,7 @@ import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
 import { isEffect, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type PlayerSelector, type Selector } from "./inst";
 import type { GameScene } from "./gamescene";
+import { Decoder } from "./instdecoder";
 
 class RunningEffect {
     constructor() {
@@ -169,8 +170,7 @@ export class InstExecutor {
                 const sourceCards = this.selectCard(selector.source, context);
                 return sourceCards.slice(-selector.max);
             case "load":
-                const loaded = context.memory.get(selector.key) ?? [];
-                return loaded.filter(value => typeof value === "object");
+                return Decoder.getCardsFromMemory(selector.key, context.memory);
         }
     }
 
@@ -180,9 +180,7 @@ export class InstExecutor {
         } else if(Array.isArray(selector)) {
             return selector;
         } else {
-            const loaded = context.memory.get(selector.key);
-            if(!loaded) return [];
-            return loaded.filter(value => typeof value === "number");
+            return Decoder.getNumbersFromMemory(selector.key, context.memory);
         }
     }
     selectPlayer(selector: PlayerSelector, context: RunningInstStream): number | undefined {
@@ -190,9 +188,10 @@ export class InstExecutor {
     }
 }
 
+export type Memory = Map<MemoryKey, MemoryValue>;
+
 class RunningInstStream {
-    memory = new Map<MemoryKey, MemoryValue>();
-    numMemory = new Map<MemoryKey, number>();
+    memory: Memory = new Map<MemoryKey, MemoryValue>();
     runningIndex = 0;
     runningEffect: RunningEffect | undefined;
     stream;
@@ -264,7 +263,7 @@ class RunningInstStream {
                 }
                 return undefined;
             case "repeat":
-                this.numMemory.set(control.counter, 0);
+                this.memory.set(control.counter, 0);
                 return this;
             case "close":
                 this.executeCloseControl(control);
@@ -278,13 +277,13 @@ class RunningInstStream {
             return;
         }
         const { beginning, beginningIndex } = result;
-        const count = this.numMemory.get(control.counter);
+        const count = Decoder.getNumberFromMemory(control.counter, this.memory);
         if(count === undefined) {
             console.error("there was no initialized counter data");
             return;
         }
         const nextCount = count + 1;
-        this.numMemory.set(control.counter, nextCount);
+        this.memory.set(control.counter, nextCount);
         if(nextCount < beginning.times) {
             this.runningIndex = beginningIndex + 1;
         }
