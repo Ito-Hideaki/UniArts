@@ -8,7 +8,7 @@ export const commonStream: { [k: string]: InstStream } = {
         paramAliases: ["draw_from"],
         body: [
             {
-                type: "save",
+                type: "save_card",
                 target: {
                     type: "top",
                     max: 1,

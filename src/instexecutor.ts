@@ -116,7 +116,7 @@ export class InstExecutor {
             switch(effect.type) {
                 case "test":
                     return false;
-                case "save":
+                case "save_card":
                     const cardsToSave = this.selectCard(effect.target, context);
                     context.memory.set(effect.key, cardsToSave);
                     return false;
