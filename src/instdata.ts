@@ -16,29 +16,20 @@ export const commonStream: { [k: string]: InstStream } = {
                         type: "pile",
                         pile: {
                             key: "deck",
-                            player: {
-                                type: "load",
-                                key: "draw_from"
-                            }
+                            player: "draw_from"
                         }
                     }
                 },
-                key: 0
+                key: "drawn"
             },
             {
                 type: "flip",
-                target: {
-                    type: "load",
-                    key: 0
-                },
+                target: "drawn",
                 isFront: true
             },
             {
                 type: "move",
-                target: {
-                    type: "load",
-                    key: 0
-                },
+                target: "drawn",
                 to: "hands"
             },
             {

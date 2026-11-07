@@ -2,7 +2,7 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileSelector, type PlayerSelector, type Selector } from "./inst";
+import { isEffect, type CardEntry, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileEntry, type PlayerEntry } from "./inst";
 import type { GameScene } from "./gamescene";
 import { Decoder } from "./instdecoder";
 
@@ -93,11 +93,11 @@ class RunningCallEffect extends RunningEffect {
     }
 }
 
-function getObjectFromPileSelector(selector: PileSelector) {
-    if(typeof selector === "string") {
-        return { key: selector };
+function getObjectFromPileEntry(entry: PileEntry) {
+    if(typeof entry === "string") {
+        return { key: entry };
     } else {
-        return { key: selector.key, ...(selector.player ? { player: selector.player } : {}) }
+        return { key: entry.key, ...(entry.player ? { player: entry.player } : {}) }
     }
 }
 
@@ -128,7 +128,7 @@ export class InstExecutor {
                 case "move": {
                     const cards = this.selectCard(effect.target, context);
                     for(const card of cards) {
-                        const to = effect.to !== undefined ? getObjectFromPileSelector(effect.to) : undefined;
+                        const to = effect.to !== undefined ? getObjectFromPileEntry(effect.to) : undefined;
                         if(to) {
                             const player = to.player !== undefined ? this.selectPlayer(to.player, context) : undefined;
                             this.boardWindow.moveCard(card, { key: to.key, player});
@@ -155,7 +155,11 @@ export class InstExecutor {
         return false;
     }
 
-    selectCard(selector: Selector, context: RunningInstStream): Card[] {
+    selectCard(entry: CardEntry, context: RunningInstStream): Card[] {
+        if(typeof entry === "string") {
+            return Decoder.getCardsFromMemory(entry, context.memory);
+        }
+        const selector = entry;
         switch(selector.type) {
             case "pile":
                 if(typeof selector.pile !== "string" && selector.pile.player !== undefined) {
@@ -169,22 +173,20 @@ export class InstExecutor {
             case "top":
                 const sourceCards = this.selectCard(selector.source, context);
                 return sourceCards.slice(-selector.max);
-            case "load":
-                return Decoder.getCardsFromMemory(selector.key, context.memory);
         }
     }
 
-    selectPlayers(selector: PlayerSelector, context: RunningInstStream): number[] {
-        if (typeof selector === "number") {
-            return [selector];
-        } else if(Array.isArray(selector)) {
-            return selector;
+    selectPlayers(entry: PlayerEntry, context: RunningInstStream): number[] {
+        if (typeof entry === "number") {
+            return [entry];
+        } else if (Array.isArray(entry)) {
+            return entry;
         } else {
-            return Decoder.getNumbersFromMemory(selector.key, context.memory);
+            return Decoder.getNumbersFromMemory(entry, context.memory);
         }
     }
-    selectPlayer(selector: PlayerSelector, context: RunningInstStream): number | undefined {
-        return this.selectPlayers(selector, context).at(0);
+    selectPlayer(entry: PlayerEntry, context: RunningInstStream): number | undefined {
+        return this.selectPlayers(entry, context).at(0);
     }
 }
 

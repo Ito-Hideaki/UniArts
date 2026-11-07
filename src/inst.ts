@@ -1,14 +1,15 @@
 import type { Card } from "./abstracts/card";
 
-export type PileSelector = string | {
-    player? : PlayerSelector;
+export type NumberEntry = number;
+
+export type PileSelector = {
+    player? : PlayerEntry;
     key: string;
 };
+export type PileEntry = MemoryKey | PileSelector;
 
-export type PlayerSelector = number | number[] | {
-    type: "load",
-    key: MemoryKey
-}
+export type PlayerSelector = number | number[];
+export type PlayerEntry = PlayerSelector | MemoryKey;
 
 export type SelectorType = {
     Pile: {
@@ -17,18 +18,15 @@ export type SelectorType = {
     },
     Top: {
         type: "top";
-        source: Selector;
-        max: number;
-    },
-    Load: {
-        type: "load";
-        key: MemoryKey;
+        source: CardEntry;
+        max: NumberEntry;
     }
 }
 
 export type Selector = SelectorType[keyof SelectorType];
+export type CardEntry = Selector | MemoryKey;
 
-export type MemoryKey = number | string;
+export type MemoryKey = string;
 export type MemoryValue = Card[] | number[] | number;
 
 export type EffectType = {
@@ -38,27 +36,27 @@ export type EffectType = {
     },
     Move: {
         type: "move";
-        target: Selector;
-        to?: PileSelector;
+        target: CardEntry;
+        to?: PileEntry;
     },
     Flip: {
         type: "flip";
-        target: Selector;
+        target: CardEntry;
         isFront: boolean;
     },
     SaveCard: {
         type: "save_card";
-        target: Selector;
+        target: CardEntry;
         key: MemoryKey;
     },
     SavePlayer: {
         type: "save_player";
-        target: PlayerSelector;
+        target: PlayerEntry;
         key: MemoryKey;
     },
     Timeout: {
         type: "timeout";
-        duration: number;
+        duration: NumberEntry;
     },
     Call: {
         type: "call";
@@ -81,7 +79,7 @@ export type ControlType = {
     Repeat: {
         type: "repeat";
         counter: MemoryKey;
-        times: number;
+        times: NumberEntry;
     },
     Close: {
         type: "close";
