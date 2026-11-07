@@ -6,7 +6,7 @@ export type PileSelector = {
     player? : PlayerEntry;
     key: string;
 };
-export type PileEntry = MemoryKey | PileSelector;
+export type PileEntry = PileSelector;
 
 export type PlayerSelector = number | number[];
 export type PlayerEntry = PlayerSelector | MemoryKey;
