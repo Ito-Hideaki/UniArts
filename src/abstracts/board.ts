@@ -1,4 +1,3 @@
-import type { PileSelector } from "../inst";
 import type { Card, CardInfo, CardState } from "./card";
 import type { Pile } from "./pile";
 
