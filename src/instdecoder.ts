@@ -30,12 +30,10 @@ export const fetchNumber = getNumberFromMemory;
 export const fetchNumArray = getNumbersFromMemory;
 
 export function getPlayers(entry: PlayerEntry, memory: Memory): number[] {
-    if (Array.isArray(entry)) {
-        return entry.map(numEntry => getNumber(numEntry, memory));
-    } else if (typeof entry === "string") {
+    if (typeof entry === "string") {
         return fetchNumArray(entry, memory);
     } else {
-        return [getNumber(entry, memory)];
+        return entry.map(numEntry => getNumber(numEntry, memory));
     }
 }
 

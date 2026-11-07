@@ -23,7 +23,7 @@ export const commonStream: { [k: string]: InstStream } = {
                 key: "drawn"
             },
             { type: "flip", target: "drawn", isFront: 1 },
-            { type: "move", target: "drawn", to: { key: "hands", player: 0 } },
+            { type: "move", target: "drawn", to: { key: "hands", player: [0] } },
             { type: "timeout", duration: 300 }
         ]
     }
@@ -39,7 +39,7 @@ systemStream.start = {
 };
 Object.assign(systemStream.deal_hands, {
     body: [
-        { type: "save_player", target: 0, key: "draw_from" },
+        { type: "save_player", target: [0], key: "draw_from" },
         { type: "save_num", value: 0, key: "i" },
         { type: "loop" },
             { type: "call", stream: commonStream.draw, params: ["draw_from"] },
