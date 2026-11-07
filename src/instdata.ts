@@ -58,19 +58,13 @@ Object.assign(systemStream.deal_hands, {
             target: 0,
             key: "draw_from"
         },
-        {
-            type: "repeat",
-            counter: "i",
-            times: 3
-        },
+        { type: "loop" },
         {
             type: "call",
             stream: commonStream.draw,
             params: ["draw_from"]
         },
-        {
-            type: "close",
-            counter: "i"
-        }
+        { type: "break" },
+        { type: "end_loop" }
     ]
 } satisfies InstStream);

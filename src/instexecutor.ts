@@ -2,9 +2,9 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
+import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import type { GameScene } from "./gamescene";
-import { fetchNumber, getCards, getPlayers } from "./instdecoder";
+import { getCards, getPlayers } from "./instdecoder";
 
 class RunningEffect {
     constructor() {
@@ -149,6 +149,45 @@ export class InstExecutor {
 
 export type Memory = Map<MemoryKey, MemoryValue>;
 
+function findBeginningOfLoop(index: number, stream: InstStream) {
+    let depth = 0;
+    for(let i = index - 1; i >= 0; i--) {
+        const inst = stream.body[i];
+        switch(inst.type) {
+            case "loop":
+                if(depth === 0) {
+                    return i;
+                } else {
+                    depth--;
+                }
+                break;
+            case "end_loop":
+                depth++;
+                break;
+        }
+    }
+    throw "unable to find the beginnning of the loop";
+}
+
+function findEndOfLoop(index: number, stream: InstStream) {
+    let depth = 0;
+    for(let i = index + 1; i < stream.body.length; i++) {
+        const inst = stream.body[i];
+        switch(inst.type) {
+            case "loop":
+                depth++;
+                break;
+            case "end_loop":
+                if(depth === 0) {
+                    return i;
+                } else {
+                    depth--;
+                }
+                break;
+        }
+    }
+    throw "unable to find the end of the loop";
+}
 class RunningInstStream {
     memory: Memory = new Map<MemoryKey, MemoryValue>();
     runningIndex = 0;
@@ -197,7 +236,6 @@ class RunningInstStream {
                 return 1;
             }
         } else {
-            this.runningIndex++;
             return this.executeControl(inst);
         }
     }
@@ -221,39 +259,18 @@ class RunningInstStream {
                     this.callInfo.return(returnValue);
                 }
                 return undefined;
-            case "repeat":
-                this.memory.set(control.counter, 0);
+            case "loop":
+                this.runningIndex++;
                 return this;
-            case "close":
-                this.executeCloseControl(control);
+            case "end_loop":
+                const beginningIndex = findBeginningOfLoop(this.runningIndex, this.stream);
+                this.runningIndex = beginningIndex;
                 return this;
-        }
-    }
-    private executeCloseControl(control: ControlType["Close"]): void {
-        const result = this.findRepetitionBeginning(control);
-        if(!result) {
-            console.error("couldn't found repetition beginning");
-            return;
-        }
-        const { beginning, beginningIndex } = result;
-        const count = fetchNumber(control.counter, this.memory);
-        if(count === undefined) {
-            console.error("there was no initialized counter data");
-            return;
-        }
-        const nextCount = count + 1;
-        this.memory.set(control.counter, nextCount);
-        if(nextCount < beginning.times) {
-            this.runningIndex = beginningIndex + 1;
-        }
-    }
+            case "break":
+                const endIndex = findEndOfLoop(this.runningIndex, this.stream);
+                this.runningIndex = endIndex + 1;
+                return this;
 
-    private findRepetitionBeginning(close: ControlType["Close"]) {
-        for(let i = this.stream.body.indexOf(close); i >= 0; i--) {
-            const inst = this.stream.body[i];
-            if(inst.type === "repeat" && inst.counter === close.counter) {
-                return { beginning: inst, beginningIndex: i };
-            }
         }
     }
 }
