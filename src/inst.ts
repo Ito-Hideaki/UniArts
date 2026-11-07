@@ -1,6 +1,11 @@
 import type { Card } from "./abstracts/card";
 
-export type NumberEntry = number | MemoryKey;
+type ArithmeticExpression = {
+    type: "+",
+    v1: NumberEntry,
+    v2: NumberEntry
+};
+export type NumberEntry = number | MemoryKey | ArithmeticExpression;
 
 export type PileSelector = {
     player: PlayerEntry;
