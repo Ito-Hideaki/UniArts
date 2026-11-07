@@ -60,10 +60,18 @@ export function getCards(entry: CardEntry, memory: Memory, board: Board): Card[]
     }
 }
 
-export function getNumber(entry: NumberEntry, memory: Memory) {
-    if(typeof entry === "string") {
-        return fetchNumber(entry, memory);
-    } else {
-        return entry;
+function dobinaryOperation(type: "+", v1: number, v2: number): number {
+    switch(type) {
+        case "+":
+            return v1 + v2;
+    }
+}
+
+export function getNumber(entry: NumberEntry, memory: Memory): number {
+    if(typeof entry === "string") return fetchNumber(entry, memory);
+    if(typeof entry === "number") return entry;
+    switch(entry.type) {
+        case "+":
+            return dobinaryOperation(entry.type, getNumber(entry.v1, memory), getNumber(entry.v2, memory));
     }
 }
