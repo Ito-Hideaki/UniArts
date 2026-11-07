@@ -76,14 +76,14 @@ export type ControlType = {
         type: "return";
         return?: MemoryKey;
     },
-    Repeat: {
-        type: "repeat";
-        counter: MemoryKey;
-        times: NumberEntry;
+    Loop: {
+        type: "loop";
     },
-    Close: {
-        type: "close";
-        counter: MemoryKey;
+    EndLoop: {
+        type: "end_loop";
+    },
+    Break: {
+        type: "break";
     }
 }
 export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
@@ -99,8 +99,9 @@ export type Control = ControlType[keyof ControlType];
 export const CONTROL_TYPES: ControlType[keyof ControlType]["type"][] = [
     "jump",
     "return",
-    "repeat",
-    "close"
+    "loop",
+    "end_loop",
+    "break"
 ];
 export type Inst = Effect | Control;
 
