@@ -3,7 +3,7 @@ import type { Card } from "./abstracts/card";
 export type NumberEntry = number;
 
 export type PileSelector = {
-    player? : PlayerEntry;
+    player: PlayerEntry;
     key: string;
 };
 export type PileEntry = PileSelector;

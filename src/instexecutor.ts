@@ -93,14 +93,6 @@ class RunningCallEffect extends RunningEffect {
     }
 }
 
-function getObjectFromPileEntry(entry: PileEntry) {
-    if(typeof entry === "string") {
-        return { key: entry };
-    } else {
-        return { key: entry.key, ...(entry.player ? { player: entry.player } : {}) }
-    }
-}
-
 export class InstExecutor {
     boardWindow;
     board;
@@ -128,10 +120,9 @@ export class InstExecutor {
                 case "move": {
                     const cards = getCards(effect.target, context.memory, this.board);
                     for(const card of cards) {
-                        const to = effect.to !== undefined ? getObjectFromPileEntry(effect.to) : undefined;
-                        if(to) {
-                            const player = to.player !== undefined ? getPlayers(to.player, context.memory).at(0) : undefined;
-                            this.boardWindow.moveCard(card, { key: to.key, player});
+                        if(effect.to) {
+                            const player = effect.to.player !== undefined ? getPlayers(effect.to.player, context.memory).at(0) : undefined;
+                            this.boardWindow.moveCard(card, { key: effect.to.key, player});
                         } else {
                             this.boardWindow.moveCard(card);
                         }
