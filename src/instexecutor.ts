@@ -1,7 +1,7 @@
 import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
-import { findCardObject } from "./cardobject";
+import { findCardObject } from "./gameobjects/cardobject";
 import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import type { GameScene } from "./gamescene";
 import { getCards, getNumber, getPlayers } from "./instdecoder";

@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { CardObject } from "./cardobject";
+import { CardObject } from "./gameobjects/cardobject";
 import { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
 import { PileObject } from "./pileobject";

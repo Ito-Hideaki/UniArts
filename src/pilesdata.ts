@@ -1,6 +1,6 @@
 import type { GameScene } from "./gamescene";
 import { Pile } from "./abstracts/pile";
-import { PileObject } from "./pileobject";
+import { PileObject } from "./gameobjects/pileobject";
 
 function createPiles0(scene: GameScene) {
     const deck = new Pile(0);
