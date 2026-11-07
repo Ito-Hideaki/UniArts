@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import type { Pile } from "./abstracts/pile";
-import type { Card } from "./abstracts/card";
+import type { Pile } from "./../abstracts/pile";
+import type { Card } from "./../abstracts/card";
 
 export class PileObject extends Phaser.GameObjects.Image {
     pile;
