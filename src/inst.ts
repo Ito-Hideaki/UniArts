@@ -49,7 +49,7 @@ export type EffectType = {
     Flip: {
         type: "flip";
         target: CardEntry;
-        isFront: boolean;
+        isFront: NumberEntry;
     },
     SaveCard: {
         type: "save_card";
