@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { CardObject } from "./gameobjects/cardobject";
 import { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import { PileObject } from "./pileobject";
+import { PileObject } from "./gameobjects/pileobject";
 import { createPilesList } from "./pilesdata";
 import { BoardWindow } from "./abstracts/boardwindow";
 import { InstStreamManager } from "./instexecutor";
