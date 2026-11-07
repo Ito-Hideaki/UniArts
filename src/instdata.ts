@@ -22,20 +22,9 @@ export const commonStream: { [k: string]: InstStream } = {
                 },
                 key: "drawn"
             },
-            {
-                type: "flip",
-                target: "drawn",
-                isFront: true
-            },
-            {
-                type: "move",
-                target: "drawn",
-                to: { key: "hands", player: 0 }
-            },
-            {
-                type: "timeout",
-                duration: 300
-            }
+            { type: "flip", target: "drawn", isFront: true },
+            { type: "move", target: "drawn", to: { key: "hands", player: 0 } },
+            { type: "timeout", duration: 300 }
         ]
     }
 };
@@ -45,10 +34,7 @@ export const systemStream: { [k: string]: InstStream } = {
 };
 systemStream.start = {
         body: [
-            {
-                type: "jump",
-                stream: systemStream.deal_hands
-            }
+            { type: "jump", stream: systemStream.deal_hands }
         ]
 };
 Object.assign(systemStream.deal_hands, {
