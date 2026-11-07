@@ -30,7 +30,7 @@ export const commonStream: { [k: string]: InstStream } = {
             {
                 type: "move",
                 target: "drawn",
-                to: "hands"
+                to: { key: "hands", player: 0 }
             },
             {
                 type: "timeout",
