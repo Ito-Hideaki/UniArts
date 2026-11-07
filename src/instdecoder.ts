@@ -32,8 +32,17 @@ export const fetchNumArray = getNumbersFromMemory;
 export function getPlayers(entry: PlayerEntry, memory: Memory): number[] {
     if (typeof entry === "string") {
         return fetchNumArray(entry, memory);
-    } else {
+    } else if(Array.isArray(entry)) {
         return entry.map(numEntry => getNumber(numEntry, memory));
+    } else {
+        switch(entry.type) {
+            case "at":
+                const source = getPlayers(entry.source, memory);
+                const index = getNumber(entry.index, memory);
+                const result = source.at(index);
+                if(result === undefined) throw "index is not valid";
+                return [result];
+        }
     }
 }
 

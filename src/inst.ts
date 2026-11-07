@@ -15,7 +15,11 @@ export type PileSelector = {
 };
 export type PileEntry = PileSelector;
 
-export type PlayerSelector = NumberEntry[];
+export type PlayerSelector = NumberEntry[] | {
+    type: "at";
+    source: PlayerEntry;
+    index: NumberEntry;
+};
 export type PlayerEntry = PlayerSelector | MemoryKey;
 
 export type SelectorType = {
