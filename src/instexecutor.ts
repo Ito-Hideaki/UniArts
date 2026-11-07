@@ -117,6 +117,9 @@ export class InstExecutor {
                     const players = getPlayers(effect.target, context.memory);
                     context.memory.set(effect.key, players);
                     return false;
+                case "save_num":
+                    context.memory.set(effect.key, getNumber(effect.value, context.memory));
+                    return false;
                 case "move": {
                     const cards = getCards(effect.target, context.memory, this.board);
                     for(const card of cards) {

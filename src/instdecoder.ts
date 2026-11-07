@@ -1,6 +1,6 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { CardEntry, MemoryKey, NumberEntry, PlayerEntry } from "./inst";
+import type { BinaryExpressionType, CardEntry, MemoryKey, NumberEntry, PlayerEntry } from "./inst";
 import type { Memory } from "./instexecutor";
 
 function getCardsFromMemory(key: MemoryKey, memory: Memory): Card[] {
@@ -60,10 +60,12 @@ export function getCards(entry: CardEntry, memory: Memory, board: Board): Card[]
     }
 }
 
-function dobinaryOperation(type: "+", v1: number, v2: number): number {
+function dobinaryOperation(type: BinaryExpressionType, v1: number, v2: number): number {
     switch(type) {
         case "+":
             return v1 + v2;
+        case "==":
+            return v1 == v2 ? 1 : 0;
     }
 }
 
@@ -72,6 +74,7 @@ export function getNumber(entry: NumberEntry, memory: Memory): number {
     if(typeof entry === "number") return entry;
     switch(entry.type) {
         case "+":
+        case "==":
             return dobinaryOperation(entry.type, getNumber(entry.v1, memory), getNumber(entry.v2, memory));
     }
 }

@@ -1,11 +1,13 @@
 import type { Card } from "./abstracts/card";
 
-type ArithmeticExpression = {
-    type: "+",
-    v1: NumberEntry,
-    v2: NumberEntry
+export type BinaryExpressionType = "+" | "==";
+type BinaryExpression = {
+    type: BinaryExpressionType;
+    v1: NumberEntry;
+    v2: NumberEntry;
 };
-export type NumberEntry = number | MemoryKey | ArithmeticExpression;
+type Expression = BinaryExpression;
+export type NumberEntry = number | MemoryKey | Expression;
 
 export type PileSelector = {
     player: PlayerEntry;
@@ -59,6 +61,11 @@ export type EffectType = {
         target: PlayerEntry;
         key: MemoryKey;
     },
+    SaveNumber: {
+        type: "save_num";
+        value: NumberEntry;
+        key: MemoryKey;
+    },
     Timeout: {
         type: "timeout";
         duration: NumberEntry;
@@ -97,6 +104,7 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "move",
     "save_card",
     "save_player",
+    "save_num",
     "test",
     "timeout",
     "call"
