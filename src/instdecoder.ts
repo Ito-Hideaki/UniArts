@@ -1,6 +1,6 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { CardEntry, MemoryKey, PlayerEntry } from "./inst";
+import type { CardEntry, MemoryKey, NumberEntry, PlayerEntry } from "./inst";
 import type { Memory } from "./instexecutor";
 
 function getCardsFromMemory(key: MemoryKey, memory: Memory): Card[] {
@@ -57,5 +57,13 @@ export function getCards(entry: CardEntry, memory: Memory, board: Board): Card[]
         case "top":
             const sourceCards = getCards(selector.source, memory, board);
             return sourceCards.slice(-selector.max);
+    }
+}
+
+export function getNumber(entry: NumberEntry, memory: Memory) {
+    if(typeof entry === "string") {
+        return fetchNumber(entry, memory);
+    } else {
+        return entry;
     }
 }

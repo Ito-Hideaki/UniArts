@@ -1,6 +1,6 @@
 import type { Card } from "./abstracts/card";
 
-export type NumberEntry = number;
+export type NumberEntry = number | MemoryKey;
 
 export type PileSelector = {
     player: PlayerEntry;
