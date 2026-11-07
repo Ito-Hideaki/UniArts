@@ -135,7 +135,7 @@ export class InstExecutor {
                 case "flip":
                     const cards = getCards(effect.target, context.memory, this.board);
                     for(const card of cards) {
-                        this.boardWindow.flipCard(card, effect.isFront);
+                        this.boardWindow.flipCard(card, Boolean(effect.isFront));
                     }
                     return false;
                 case "timeout":

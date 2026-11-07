@@ -22,7 +22,7 @@ export const commonStream: { [k: string]: InstStream } = {
                 },
                 key: "drawn"
             },
-            { type: "flip", target: "drawn", isFront: true },
+            { type: "flip", target: "drawn", isFront: 1 },
             { type: "move", target: "drawn", to: { key: "hands", player: 0 } },
             { type: "timeout", duration: 300 }
         ]
