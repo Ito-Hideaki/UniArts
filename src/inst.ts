@@ -84,6 +84,7 @@ export type ControlType = {
     },
     Break: {
         type: "break";
+        if?: NumberEntry;
     }
 }
 export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
