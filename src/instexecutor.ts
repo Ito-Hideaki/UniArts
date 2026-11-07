@@ -4,7 +4,7 @@ import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
 import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import type { GameScene } from "./gamescene";
-import { getCards, getPlayers } from "./instdecoder";
+import { getCards, getNumber, getPlayers } from "./instdecoder";
 
 class RunningEffect {
     constructor() {
@@ -33,9 +33,9 @@ class RunningMoveEffect extends RunningEffect {
 
 class RunningTimeoutEffect extends RunningEffect {
     expired = false;
-    constructor(scene: GameScene, effect: EffectType["Timeout"]) {
+    constructor(scene: GameScene, duration: number) {
         super();
-        scene.time.delayedCall(effect.duration, () => {
+        scene.time.delayedCall(duration, () => {
             this.expired = true;
         });
     }
@@ -136,7 +136,8 @@ export class InstExecutor {
                     }
                     return false;
                 case "timeout":
-                    return new RunningTimeoutEffect(this.scene, effect);
+                    const duration = getNumber(effect.duration, context.memory);
+                    return new RunningTimeoutEffect(this.scene, duration);
                 case "call":
                     return new RunningCallEffect(effect, context);
             }
