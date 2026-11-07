@@ -11,6 +11,7 @@ import * as effectData from "./instdata";
 import { vPath } from "./util";
 import type { GameInfo } from "./gameinfo";
 import type { Pile } from "./abstracts/pile";
+import { TurnDisplay } from "./abstracts/turndisplay";
 
 export class GameScene extends Phaser.Scene {
 
@@ -30,12 +31,19 @@ export class GameScene extends Phaser.Scene {
             const cardTexture = this.textures.get("card");
             addCardTextureFrames(cardTexture);
         });
+        this.load.image("turn_display", vPath("/image/turn_display.png"));
+        this.load.once("complete", () => {
+            const texture = this.textures.get("turn_display");
+            texture.add("opponent", 0, 0, 0, 300, 100);
+            texture.add("you", 0, 0, 100, 300, 100);
+        });
     }
 
     create() {
         this.info = {
             playerNum: 2
         };
+        this.add.existing(new TurnDisplay(this, 200, 500));
         const piles: { [k: string]: Pile }[] = [];
         for(let pID = 0; pID < this.info.playerNum; pID++) {
             const { piles: playerPiles, pileObjects } = createPilesList[pID](this);
