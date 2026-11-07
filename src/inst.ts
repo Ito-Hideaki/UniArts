@@ -14,7 +14,7 @@ export type PlayerEntry = PlayerSelector | MemoryKey;
 export type SelectorType = {
     Pile: {
         type: "pile";
-        pile: PileSelector;
+        pile: PileEntry;
     },
     Top: {
         type: "top";
