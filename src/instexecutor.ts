@@ -4,7 +4,7 @@ import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
 import { isEffect, type CardEntry, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileEntry, type PlayerEntry } from "./inst";
 import type { GameScene } from "./gamescene";
-import { Decoder } from "./instdecoder";
+import { fetchCards, fetchNumArray, fetchNumber } from "./instdecoder";
 
 class RunningEffect {
     constructor() {
@@ -157,7 +157,7 @@ export class InstExecutor {
 
     selectCard(entry: CardEntry, context: RunningInstStream): Card[] {
         if(typeof entry === "string") {
-            return Decoder.getCardsFromMemory(entry, context.memory);
+            return fetchCards(entry, context.memory);
         }
         const selector = entry;
         switch(selector.type) {
@@ -182,7 +182,7 @@ export class InstExecutor {
         } else if (Array.isArray(entry)) {
             return entry;
         } else {
-            return Decoder.getNumbersFromMemory(entry, context.memory);
+            return fetchNumArray(entry, context.memory);
         }
     }
     selectPlayer(entry: PlayerEntry, context: RunningInstStream): number | undefined {
@@ -279,7 +279,7 @@ class RunningInstStream {
             return;
         }
         const { beginning, beginningIndex } = result;
-        const count = Decoder.getNumberFromMemory(control.counter, this.memory);
+        const count = fetchNumber(control.counter, this.memory);
         if(count === undefined) {
             console.error("there was no initialized counter data");
             return;

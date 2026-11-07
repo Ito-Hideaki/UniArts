@@ -24,8 +24,6 @@ function getNumberFromMemory(key: MemoryKey, memory: Memory): number {
     return raw;
 }
 
-export const Decoder = {
-    getCardsFromMemory,
-    getNumberFromMemory,
-    getNumbersFromMemory
-} as const;
+export const fetchCards = getCardsFromMemory;
+export const fetchNumber = getNumberFromMemory;
+export const fetchNumArray = getNumbersFromMemory;
