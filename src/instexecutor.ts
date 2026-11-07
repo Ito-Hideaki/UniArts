@@ -268,8 +268,12 @@ class RunningInstStream {
                 this.runningIndex = beginningIndex;
                 return this;
             case "break":
-                const endIndex = findEndOfLoop(this.runningIndex, this.stream);
-                this.runningIndex = endIndex + 1;
+                if (control.if !== undefined && !getNumber(control.if, this.memory)) {
+                    this.runningIndex++;
+                } else {
+                    const endIndex = findEndOfLoop(this.runningIndex, this.stream);
+                    this.runningIndex = endIndex + 1;
+                }
                 return this;
 
         }
