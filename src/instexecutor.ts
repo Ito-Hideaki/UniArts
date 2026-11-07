@@ -2,9 +2,9 @@ import type { Board } from "./abstracts/board";
 import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./cardobject";
-import { isEffect, type CardEntry, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileEntry, type PlayerEntry } from "./inst";
+import { isEffect, type Control, type ControlType, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue, type PileEntry } from "./inst";
 import type { GameScene } from "./gamescene";
-import { fetchCards, fetchNumArray, fetchNumber } from "./instdecoder";
+import { fetchNumber, getCards, getPlayers } from "./instdecoder";
 
 class RunningEffect {
     constructor() {
@@ -118,19 +118,19 @@ export class InstExecutor {
                 case "test":
                     return false;
                 case "save_card":
-                    const cardsToSave = this.selectCard(effect.target, context);
+                    const cardsToSave = getCards(effect.target, context.memory, this.board);
                     context.memory.set(effect.key, cardsToSave);
                     return false;
                 case "save_player":
-                    const players = this.selectPlayers(effect.target, context);
+                    const players = getPlayers(effect.target, context.memory);
                     context.memory.set(effect.key, players);
                     return false;
                 case "move": {
-                    const cards = this.selectCard(effect.target, context);
+                    const cards = getCards(effect.target, context.memory, this.board);
                     for(const card of cards) {
                         const to = effect.to !== undefined ? getObjectFromPileEntry(effect.to) : undefined;
                         if(to) {
-                            const player = to.player !== undefined ? this.selectPlayer(to.player, context) : undefined;
+                            const player = to.player !== undefined ? getPlayers(to.player, context.memory).at(0) : undefined;
                             this.boardWindow.moveCard(card, { key: to.key, player});
                         } else {
                             this.boardWindow.moveCard(card);
@@ -139,7 +139,7 @@ export class InstExecutor {
                     return new RunningMoveEffect(this.scene, cards);
                 }
                 case "flip":
-                    const cards = this.selectCard(effect.target, context);
+                    const cards = getCards(effect.target, context.memory, this.board);
                     for(const card of cards) {
                         this.boardWindow.flipCard(card, effect.isFront);
                     }
@@ -153,40 +153,6 @@ export class InstExecutor {
             console.error(e);
         }
         return false;
-    }
-
-    selectCard(entry: CardEntry, context: RunningInstStream): Card[] {
-        if(typeof entry === "string") {
-            return fetchCards(entry, context.memory);
-        }
-        const selector = entry;
-        switch(selector.type) {
-            case "pile":
-                if(typeof selector.pile !== "string" && selector.pile.player !== undefined) {
-                    const player = this.selectPlayer(selector.pile.player, context);
-                    if(player === undefined) {
-                        console.error("found no player to choose pile from");
-                        return [];
-                    }
-                    return this.board.piles[player][selector.pile.key].cards;
-                } else return [];
-            case "top":
-                const sourceCards = this.selectCard(selector.source, context);
-                return sourceCards.slice(-selector.max);
-        }
-    }
-
-    selectPlayers(entry: PlayerEntry, context: RunningInstStream): number[] {
-        if (typeof entry === "number") {
-            return [entry];
-        } else if (Array.isArray(entry)) {
-            return entry;
-        } else {
-            return fetchNumArray(entry, context.memory);
-        }
-    }
-    selectPlayer(entry: PlayerEntry, context: RunningInstStream): number | undefined {
-        return this.selectPlayers(entry, context).at(0);
     }
 }
 
