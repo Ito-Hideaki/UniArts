@@ -1,10 +1,9 @@
-import type { Board } from "./abstracts/board";
-import type { BoardWindow } from "./abstracts/boardwindow";
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./gameobjects/cardobject";
 import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import type { GameScene } from "./gamescene";
 import { getCards, getNumber, getPlayers } from "./instdecoder";
+import type { Run } from "./run";
 
 class RunningEffect {
     constructor() {
@@ -19,9 +18,9 @@ class RunningEffect {
 class RunningMoveEffect extends RunningEffect {
     cardObjects;
 
-    constructor(scene: GameScene, cards: Card[]) {
+    constructor(run: Run, cards: Card[]) {
         super();
-        this.cardObjects = cards.map(card => findCardObject(card, scene.cards));
+        this.cardObjects = cards.map(card => findCardObject(card, run.cardObjects));
     }
 
     progress() {
@@ -94,23 +93,27 @@ class RunningCallEffect extends RunningEffect {
 }
 
 export class InstExecutor {
-    boardWindow;
-    board;
     scene;
+    run: Run | undefined;
 
-    constructor(scene: GameScene, board: Board, window: BoardWindow) {
-        this.boardWindow = window;
-        this.board = board;
+    constructor(scene: GameScene) {
         this.scene = scene;
     }
 
+    setRun(run: Run) {
+        this.run = run;
+    }
+
     executeEffect(effect: Effect, context: RunningInstStream): false | RunningEffect {
+        const run = this.run;
+        if(!run) throw "the run is not set";
+
         try {
             switch(effect.type) {
                 case "test":
                     return false;
                 case "save_card":
-                    const cardsToSave = getCards(effect.target, context.memory, this.board);
+                    const cardsToSave = getCards(effect.target, context.memory, run.board);
                     context.memory.set(effect.key, cardsToSave);
                     return false;
                 case "save_player":
@@ -121,21 +124,21 @@ export class InstExecutor {
                     context.memory.set(effect.key, getNumber(effect.value, context.memory));
                     return false;
                 case "move": {
-                    const cards = getCards(effect.target, context.memory, this.board);
+                    const cards = getCards(effect.target, context.memory, run.board);
                     for(const card of cards) {
                         if(effect.to) {
                             const player = effect.to.player !== undefined ? getPlayers(effect.to.player, context.memory).at(0) : undefined;
-                            this.boardWindow.moveCard(card, { key: effect.to.key, player});
+                            run.boardWindow.moveCard(card, { key: effect.to.key, player});
                         } else {
-                            this.boardWindow.moveCard(card);
+                            run.boardWindow.moveCard(card);
                         }
                     }
-                    return new RunningMoveEffect(this.scene, cards);
+                    return new RunningMoveEffect(run, cards);
                 }
                 case "flip":
-                    const cards = getCards(effect.target, context.memory, this.board);
+                    const cards = getCards(effect.target, context.memory, run.board);
                     for(const card of cards) {
-                        this.boardWindow.flipCard(card, Boolean(effect.isFront));
+                        run.boardWindow.flipCard(card, Boolean(effect.isFront));
                     }
                     return false;
                 case "timeout":
@@ -287,8 +290,8 @@ export class InstStreamManager {
     instExecutor;
     running: RunningInstStream | undefined;
 
-    constructor(scene: GameScene, board: Board, window: BoardWindow) {
-        this.instExecutor = new InstExecutor(scene, board, window);
+    constructor(executor: InstExecutor) {
+        this.instExecutor = executor;
     }
 
     executeStream(stream: InstStream) {
