@@ -5,7 +5,7 @@ import type { GameInfo } from "./gameinfo";
 import type { CardObject } from "./gameobjects/cardobject";
 import type { PileObject } from "./gameobjects/pileobject";
 import type { GameScene } from "./gamescene";
-import { InstExecutor, InstStreamManager } from "./instexecutor";
+import { InstExecutor, InstStreamManager, type Memory } from "./instexecutor";
 
 type PlayerPiles = { [k: string]: Pile };
 
@@ -26,6 +26,7 @@ export interface Run {
     boardWindow: BoardWindow;
     info: GameInfo;
     instStreamManager: InstStreamManager;
+    state: Memory;
 }
 
 export function startRun(scene: GameScene): Run {
@@ -37,6 +38,8 @@ export function startRun(scene: GameScene): Run {
     const boardWindow = new BoardWindow(board);
     const instExecutor = new InstExecutor(scene);
     const instStreamManager = new InstStreamManager(instExecutor);
+    const state: Memory = new Map();
+    state.set("current_player", 0);
     const run: Run = {
         info,
         pileObjects: new Set(),
@@ -44,7 +47,8 @@ export function startRun(scene: GameScene): Run {
         piles,
         board,
         boardWindow,
-        instStreamManager
+        instStreamManager,
+        state
     };
     instExecutor.setRun(run);
     return run;

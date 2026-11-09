@@ -13,7 +13,7 @@ export class GameScene extends Phaser.Scene {
         super("game");
     }
 
-    private progressRun: () => void = () => {};
+    private run: Run | undefined;
 
     preload() {
         this.load.image("card", vPath("/image/card.png"));
@@ -31,7 +31,7 @@ export class GameScene extends Phaser.Scene {
 
     create() {
         const run = startRun(this);
-        this.progressRun = () => Run.progress(run);
+        this.run = run;
 
         this.add.existing(new TurnDisplay(this, 200, 500));
 
@@ -73,6 +73,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     update() {
-        this.progressRun();
+        if(this.run) Run.progress(this.run);
+    }
+
+    getRun() {
+        if(!this.run) throw "run is not set";
+        return this.run;
     }
 }
