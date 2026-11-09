@@ -5,7 +5,7 @@ import { createPilesList } from "./pilesdata";
 import { addCardTextureFrames } from "./cardtexture";
 import * as effectData from "./instdata";
 import { vPath } from "./util";
-import { TurnDisplay } from "./abstracts/turndisplay";
+import { TurnDisplay } from "./gameobjects/turndisplay";
 import { Run, startRun } from "./run";
 
 export class GameScene extends Phaser.Scene {
