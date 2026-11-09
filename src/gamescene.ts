@@ -1,29 +1,19 @@
 import Phaser from "phaser";
 import { CardObject } from "./gameobjects/cardobject";
-import { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import { PileObject } from "./gameobjects/pileobject";
 import { createPilesList } from "./pilesdata";
-import { BoardWindow } from "./abstracts/boardwindow";
-import { InstStreamManager } from "./instexecutor";
 import { addCardTextureFrames } from "./cardtexture";
 import * as effectData from "./instdata";
 import { vPath } from "./util";
-import type { GameInfo } from "./gameinfo";
-import type { Pile } from "./abstracts/pile";
 import { TurnDisplay } from "./abstracts/turndisplay";
+import { Run, startRun } from "./run";
 
 export class GameScene extends Phaser.Scene {
-
-    piles = new Set<PileObject>();
-    cards = new Set<CardObject>();
-
-    //@ts-ignore
-    info: GameInfo;
-
     constructor() {
         super("game");
     }
+
+    private progressRun: () => void = () => {};
 
     preload() {
         this.load.image("card", vPath("/image/card.png"));
@@ -40,36 +30,32 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        this.info = {
-            playerNum: 2
-        };
-        this.add.existing(new TurnDisplay(this, 200, 500));
-        const piles: { [k: string]: Pile }[] = [];
-        for(let pID = 0; pID < this.info.playerNum; pID++) {
-            const { piles: playerPiles, pileObjects } = createPilesList[pID](this);
-            for(const pileObject of Object.values(pileObjects)) {
-                this.addPileObject(pileObject);
-            }
-            piles.push(playerPiles);
-        }
-        const board = new Board(piles);
-        const boardWindow = new BoardWindow(board);
-        const instStreamManager = new InstStreamManager(this, board, boardWindow);
-        this.events.on("update", () => { instStreamManager.progress(); });
+        const run = startRun(this);
+        this.progressRun = () => Run.progress(run);
 
-        for(let pID = 0; pID < this.info.playerNum; pID++) {
+        this.add.existing(new TurnDisplay(this, 200, 500));
+
+        run.piles.forEach((targetPlayerPiles, pID) => {
+            const { piles: sourcePlayerPiles, pileObjects } = createPilesList[pID](this);
+            Object.assign(targetPlayerPiles, sourcePlayerPiles);
+            for(const pileObject of Object.values(pileObjects)) {
+                Run.addPileObject(this, run, pileObject);
+            }
+        });
+
+        for(let pID = 0; pID < run.info.playerNum; pID++) {
             for(let i = 0; i < 10; i++) {
-                const card: Card = board.createCard({ name: "foo" }, { isFront: false });
-                const cardObject = new CardObject(this, card);
+                const card: Card = run.board.createCard({ name: "foo" }, { isFront: false });
+                const cardObject = new CardObject(this, run, card);
                 this.add.existing(cardObject);
-                this.cards.add(cardObject);
-                boardWindow.moveCard(card, { key: "deck", player: pID });
+                run.cardObjects.add(cardObject);
+                run.boardWindow.moveCard(card, { key: "deck", player: pID });
             }
         }
 
         this.input.keyboard?.on("keydown", (e: KeyboardEvent) => {
             if(e.key.toLowerCase() === "k") {
-                instStreamManager.executeStream({
+                run.instStreamManager.executeStream({
                     body: [
                         {
                             type: "call",
@@ -86,8 +72,7 @@ export class GameScene extends Phaser.Scene {
         });
     }
 
-    addPileObject(pile: PileObject) {
-        this.add.existing(pile);
-        this.piles.add(pile);
+    update() {
+        this.progressRun();
     }
 }

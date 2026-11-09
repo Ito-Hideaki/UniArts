@@ -3,17 +3,20 @@ import type { Card } from "../abstracts/card";
 import type { GameScene } from "../gamescene";
 import { findPileObject } from "./pileobject";
 import type { Pile } from "../abstracts/pile";
+import type { Run } from "../run";
 
 export class CardObject extends Phaser.GameObjects.Image {
     card;
     scene: GameScene;
     velocity = new Phaser.Math.Vector2();
     isMoving = false;
+    run: Run;
 
-    constructor(scene: GameScene, card: Card) {
+    constructor(scene: GameScene, run: Run, card: Card) {
         super(scene, 0, 0, "card");
         this.scene = scene;
         this.card = card;
+        this.run = run;
 
         this.setOrigin(0.5, 0.5);
         this.setScale(2.5);
@@ -81,7 +84,7 @@ export class CardObject extends Phaser.GameObjects.Image {
     }
 
     private getDestinationFromPile(pile: Pile) {
-        const pileObject = findPileObject(pile, this.scene.piles);
+        const pileObject = findPileObject(pile, this.run.pileObjects);
         if(!pileObject) return;
 
         const { x, y } = pileObject.getCardXY(this.card);
