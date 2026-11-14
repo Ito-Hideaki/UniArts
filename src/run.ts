@@ -1,5 +1,5 @@
 import { Board } from "./abstracts/board";
-import { BoardWindow } from "./abstracts/boardwindow";
+import { BoardWindow } from "./boardwindow";
 import type { Pile } from "./abstracts/pile";
 import type { GameInfo } from "./gameinfo";
 import type { CardObject } from "./gameobjects/cardobject";

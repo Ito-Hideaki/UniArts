@@ -1,5 +1,5 @@
-import type { Board } from "./board";
-import type { Card } from "./card";
+import type { Board } from "./abstracts/board";
+import type { Card } from "./abstracts/card";
 
 /** operations that are guaranteed to be executed safely or to throw error */
 export class BoardWindow {
