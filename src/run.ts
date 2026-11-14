@@ -15,7 +15,8 @@ export const Run = {
         run.pileObjects.add(pile);
     },
     progress: function(run: Run) {
-        run.instStreamManager.progress();
+        const instStreamManager = run.get.instStreamManager();
+        instStreamManager.progress();
     }
 };
 export interface Run {
@@ -25,21 +26,26 @@ export interface Run {
     board: Board;
     boardWindow: BoardWindow;
     info: GameInfo;
-    instStreamManager: InstStreamManager;
+    get: {
+        instStreamManager: () => InstStreamManager
+    };
     state: Memory;
+    scene: Phaser.Scene;
 }
 
 export function startRun(scene: GameScene): Run {
+    const getFrom: {
+        instStreamManager?: InstStreamManager;
+    } = {};
     const info: GameInfo = {
         playerNum: 2
     };
     const piles: PlayerPiles[] = new Array(info.playerNum).fill(0).map(() => { return {}; });
     const board = new Board(piles);
     const boardWindow = new BoardWindow(board);
-    const instExecutor = new InstExecutor(scene);
-    const instStreamManager = new InstStreamManager(instExecutor);
     const state: Memory = new Map();
     state.set("current_player", 0);
+
     const run: Run = {
         info,
         pileObjects: new Set(),
@@ -47,9 +53,17 @@ export function startRun(scene: GameScene): Run {
         piles,
         board,
         boardWindow,
-        instStreamManager,
-        state
+        get: {
+            instStreamManager: () => {
+                if(!getFrom.instStreamManager) throw "getFrom.instStreamManager is not initialized";
+                return getFrom.instStreamManager;
+            }
+        },
+        state,
+        scene
     };
-    instExecutor.setRun(run);
+
+    const instExecutor = new InstExecutor(run);
+    getFrom.instStreamManager = new InstStreamManager(instExecutor);
     return run;
 }

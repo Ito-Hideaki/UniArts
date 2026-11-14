@@ -1,7 +1,6 @@
 import type { Card } from "./abstracts/card";
 import { findCardObject } from "./gameobjects/cardobject";
 import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
-import type { GameScene } from "./gamescene";
 import { getCards, getNumber, getPlayers } from "./instdecoder";
 import type { Run } from "./run";
 
@@ -32,7 +31,7 @@ class RunningMoveEffect extends RunningEffect {
 
 class RunningTimeoutEffect extends RunningEffect {
     expired = false;
-    constructor(scene: GameScene, duration: number) {
+    constructor(scene: Phaser.Scene, duration: number) {
         super();
         scene.time.delayedCall(duration, () => {
             this.expired = true;
@@ -94,19 +93,15 @@ class RunningCallEffect extends RunningEffect {
 
 export class InstExecutor {
     scene;
-    run: Run | undefined;
+    run: Run;
 
-    constructor(scene: GameScene) {
-        this.scene = scene;
-    }
-
-    setRun(run: Run) {
+    constructor(run: Run) {
         this.run = run;
+        this.scene = run.scene;
     }
 
     executeEffect(effect: Effect, context: RunningInstStream): false | RunningEffect {
         const run = this.run;
-        if(!run) throw "the run is not set";
 
         try {
             switch(effect.type) {
