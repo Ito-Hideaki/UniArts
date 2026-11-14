@@ -2,7 +2,7 @@ import type { Card } from "./abstracts/card";
 import { findCardObject } from "./gameobjects/cardobject";
 import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import { getCards, getNumber, getPlayers } from "./instdecoder";
-import type { Memory, FullMemory } from "./instdecoder";
+import { type Memory, FullMemory } from "./instdecoder";
 import type { Run } from "./run";
 
 class RunningEffect {
@@ -113,14 +113,14 @@ export class InstExecutor {
                     return false;
                 case "save_card":
                     const cardsToSave = getCards(effect.target, fullMemory, run.board);
-                    context.localMemory.set(effect.key, cardsToSave);
+                    FullMemory.set(fullMemory, effect.key, cardsToSave);
                     return false;
                 case "save_player":
                     const players = getPlayers(effect.target, fullMemory);
-                    context.localMemory.set(effect.key, players);
+                    FullMemory.set(fullMemory, effect.key, players);
                     return false;
                 case "save_num":
-                    context.localMemory.set(effect.key, getNumber(effect.value, fullMemory));
+                    FullMemory.set(fullMemory, effect.key, getNumber(effect.value, fullMemory));
                     return false;
                 case "move": {
                     const cards = getCards(effect.target, fullMemory, run.board);

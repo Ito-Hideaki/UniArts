@@ -7,12 +7,19 @@ export type FullMemory = {
     local: Memory;
     run: Memory;
 };
-const FullMemory = {
+export const FullMemory = {
     get: function(memory: FullMemory, key: MemoryKey) {
         if(key.slice(0, 2) === "r.") {
             return memory.run.get(key.slice(2));
         } else {
             return memory.local.get(key);
+        }
+    },
+    set: function(memory: FullMemory, key: MemoryKey, value: MemoryValue) {
+        if(key.slice(0, 2) === "r.") {
+            return memory.run.set(key.slice(2), value);
+        } else {
+            return memory.local.set(key, value);
         }
     }
 };
