@@ -1,5 +1,4 @@
 import { Board } from "./abstracts/board";
-import { BoardWindow } from "./boardwindow";
 import type { Pile } from "./abstracts/pile";
 import type { GameInfo } from "./gameinfo";
 import type { CardObject } from "./gameobjects/cardobject";
@@ -29,7 +28,6 @@ export interface Run {
     cardObjects: Set<CardObject>;
     piles: PlayerPiles[];
     board: Board;
-    boardWindow: BoardWindow;
     info: GameInfo;
     get: {
         instStreamManager: () => InstStreamManager
@@ -48,7 +46,6 @@ export function startRun(scene: GameScene): Run {
     };
     const piles: PlayerPiles[] = new Array(info.playerNum).fill(0).map(() => { return {}; });
     const board = new Board(piles);
-    const boardWindow = new BoardWindow(board);
     const state: Memory = new Map();
     state.set("current_player", 0);
     const registeredStream: Map<string, InstStream> = new Map();
@@ -59,7 +56,6 @@ export function startRun(scene: GameScene): Run {
         cardObjects: new Set(),
         piles,
         board,
-        boardWindow,
         registeredStream,
         get: {
             instStreamManager: () => {

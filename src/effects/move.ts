@@ -26,9 +26,9 @@ export function executeMoveEffect(run: Run, effect: EffectType["Move"], context:
     for(const card of cards) {
         if(effect.to) {
             const player = effect.to.player !== undefined ? getPlayers(effect.to.player, context.fullMemory).at(0) : undefined;
-            run.boardWindow.moveCard(card, { key: effect.to.key, player});
+            run.board.moveCard(card, { key: effect.to.key, player});
         } else {
-            run.boardWindow.moveCard(card);
+            run.board.moveCard(card);
         }
     }
     return new RunningMoveEffect(run, cards);
