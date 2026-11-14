@@ -76,7 +76,7 @@ export type EffectType = {
     },
     Call: {
         type: "call";
-        stream: InstStream;
+        stream: string;
         params: MemoryKey[];
         saveTo?: MemoryKey;
     }
@@ -86,7 +86,7 @@ export type Effect = EffectType[keyof EffectType]
 export type ControlType = {
     Jump: {
         type: "jump";
-        stream: InstStream;
+        stream: string;
     },
     Return: {
         type: "return";

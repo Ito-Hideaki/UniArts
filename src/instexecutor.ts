@@ -56,7 +56,7 @@ class RunningCallEffect extends RunningEffect {
     private returnFunction;
     private run;
 
-    constructor(effect: EffectType["Call"], context: RunningInstStream, run: Run) {
+    constructor(effect: EffectType["Call"], stream: InstStream, context: RunningInstStream, run: Run) {
         super();
         this.parentMemory = context.localMemory;
         this.instExecutor = context.instExecutor;
@@ -73,7 +73,7 @@ class RunningCallEffect extends RunningEffect {
             }),
             return: this.returnFunction
         };
-        this.subRunning = new RunningInstStream(this.run, this.instExecutor, effect.stream, callInfo);
+        this.subRunning = new RunningInstStream(this.run, this.instExecutor, stream, callInfo);
     }
 
     progress(): boolean {
@@ -144,7 +144,13 @@ export class InstExecutor {
                     const duration = getNumber(effect.duration, fullMemory);
                     return new RunningTimeoutEffect(this.scene, duration);
                 case "call":
-                    return new RunningCallEffect(effect, context, this.run);
+                    const stream = this.run.registeredStream.get(effect.stream);
+                    if(stream) {
+                        return new RunningCallEffect(effect, stream, context, this.run);
+                    } else {
+                        console.error(`stream ${effect.stream} was not found`);
+                        return false;
+                    }
             }
         } catch(e) {
             console.error(e);
@@ -192,6 +198,7 @@ function findEndOfLoop(index: number, stream: InstStream) {
     }
     throw "unable to find the end of the loop";
 }
+
 class RunningInstStream {
     localMemory: Memory = new Map<MemoryKey, MemoryValue>();
     fullMemory: FullMemory;
@@ -260,7 +267,13 @@ class RunningInstStream {
     private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
-                return new RunningInstStream(this.run, this.instExecutor, control.stream);
+                const stream = this.run.registeredStream.get(control.stream);
+                if(stream) {
+                    return new RunningInstStream(this.run, this.instExecutor, stream);
+                } else {
+                    console.error(`stream ${control.stream} was not found`);
+                    return this;
+                }
             case "return":
                 if(this.callInfo) {
                     const returnValue = control.return ? this.localMemory.get(control.return) : undefined;

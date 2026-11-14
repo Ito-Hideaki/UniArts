@@ -7,7 +7,7 @@ import type { PileObject } from "./gameobjects/pileobject";
 import type { GameScene } from "./gamescene";
 import { InstExecutor, InstStreamManager } from "./instexecutor";
 import { isMemoryNumber, type Memory } from "./instdecoder";
-import type { MemoryKey } from "./inst";
+import type { InstStream, MemoryKey } from "./inst";
 
 type PlayerPiles = { [k: string]: Pile };
 
@@ -36,6 +36,7 @@ export interface Run {
     };
     state: Memory;
     scene: Phaser.Scene;
+    registeredStream: Map<string, InstStream>;
 }
 
 export function startRun(scene: GameScene): Run {
@@ -50,6 +51,7 @@ export function startRun(scene: GameScene): Run {
     const boardWindow = new BoardWindow(board);
     const state: Memory = new Map();
     state.set("current_player", 0);
+    const registeredStream: Map<string, InstStream> = new Map();
 
     const run: Run = {
         info,
@@ -58,6 +60,7 @@ export function startRun(scene: GameScene): Run {
         piles,
         board,
         boardWindow,
+        registeredStream,
         get: {
             instStreamManager: () => {
                 if(!getFrom.instStreamManager) throw "getFrom.instStreamManager is not initialized";

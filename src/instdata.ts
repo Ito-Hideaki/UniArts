@@ -30,28 +30,27 @@ export const commonStream: { [k: string]: InstStream } = {
 };
 
 export const systemStream: { [k: string]: InstStream } = {
-    deal_hands: NULL_STREAM
-};
-systemStream.start = {
+    start: {
+            body: [
+                { type: "jump", stream: "system.deal_hands" }
+            ]
+    },
+    deal_hands: {
         body: [
-            { type: "jump", stream: systemStream.deal_hands }
-        ]
-};
-Object.assign(systemStream.deal_hands, {
-    body: [
-        { type: "save_num", value: 0, key: "pi" },
-        { type: "loop" },
-            { type: "save_num", value: 0, key: "i" },
+            { type: "save_num", value: 0, key: "pi" },
             { type: "loop" },
-                { type: "save_player", key: "player", target: ["pi"] },
-                { type: "call", stream: commonStream.draw, params: ["player"] },
+                { type: "save_num", value: 0, key: "i" },
+                { type: "loop" },
+                    { type: "save_player", key: "player", target: ["pi"] },
+                    { type: "call", stream: "common.draw", params: ["player"] },
 
-                { type: "save_num", key: "i", value: { type: "+", v1: "i", v2: 1 } },
-                { type: "break", if: { type: "==", v1: "i", v2: 3 } },
-            { type: "end_loop" },
+                    { type: "save_num", key: "i", value: { type: "+", v1: "i", v2: 1 } },
+                    { type: "break", if: { type: "==", v1: "i", v2: 3 } },
+                { type: "end_loop" },
 
-            { type: "save_num", key: "pi", value: { type: "+", v1: "pi", v2: 1 } },
-            { type: "break", if: { type: "==", v1: "pi", v2: 2 } },
-        { type: "end_loop" }
-    ]
-} satisfies InstStream);
+                { type: "save_num", key: "pi", value: { type: "+", v1: "pi", v2: 1 } },
+                { type: "break", if: { type: "==", v1: "pi", v2: 2 } },
+            { type: "end_loop" }
+        ]
+    },
+};

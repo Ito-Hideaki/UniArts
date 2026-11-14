@@ -3,7 +3,7 @@ import { CardObject } from "./gameobjects/cardobject";
 import type { Card } from "./abstracts/card";
 import { createPilesList } from "./pilesdata";
 import { addCardTextureFrames } from "./cardtexture";
-import * as effectData from "./instdata";
+import { commonStream, systemStream } from "./instdata";
 import { vPath } from "./util";
 import { TurnDisplay } from "./gameobjects/turndisplay";
 import { Run, startRun } from "./run";
@@ -53,13 +53,20 @@ export class GameScene extends Phaser.Scene {
             }
         }
 
+        for(const key in commonStream) {
+            run.registeredStream.set("common." + key, commonStream[key]);
+        }
+        for(const key in systemStream) {
+            run.registeredStream.set("system." + key, systemStream[key]);
+        }
+
         this.input.keyboard?.on("keydown", (e: KeyboardEvent) => {
             if(e.key.toLowerCase() === "k") {
                 run.get.instStreamManager().executeStream({
                     body: [
                         {
                             type: "call",
-                            stream: effectData.systemStream.start,
+                            stream: "system.start",
                             params: []
                         }
                     ]
