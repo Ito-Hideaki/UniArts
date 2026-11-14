@@ -1,98 +1,17 @@
-import type { Card } from "./abstracts/card";
-import { findCardObject } from "./gameobjects/cardobject";
-import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
+import { executeCallEffect } from "./effects/call";
+import { RunningEffect } from "./effects/effect";
+import { executeFlipEffect } from "./effects/flip";
+import { executeMoveEffect } from "./effects/move";
+import { executeTimeoutEffect } from "./effects/timeout";
+import { isEffect, type Control, type Effect, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import { getCards, getNumber, getPlayers } from "./instdecoder";
 import { type Memory, FullMemory } from "./instdecoder";
 import type { Run } from "./run";
 
-class RunningEffect {
-    constructor() {
-    }
-
-    /** @return if it's still running or not */
-    progress(): boolean {
-        return true;
-    }
-}
-
-class RunningMoveEffect extends RunningEffect {
-    cardObjects;
-
-    constructor(run: Run, cards: Card[]) {
-        super();
-        this.cardObjects = cards.map(card => findCardObject(card, run.cardObjects));
-    }
-
-    progress() {
-        // const movingCard = this.cardObjects.find(cardObject => cardObject?.isMoving);
-        // return Boolean(movingCard);
-        return false;
-    }
-}
-
-class RunningTimeoutEffect extends RunningEffect {
-    expired = false;
-    constructor(scene: Phaser.Scene, duration: number) {
-        super();
-        scene.time.delayedCall(duration, () => {
-            this.expired = true;
-        });
-    }
-
-    progress(): boolean {
-        return !this.expired;
-    }
-}
-
-type CallInfo = {
+export type CallInfo = {
     params: MemoryValue[]
     return: (value?: MemoryValue) => void;
 };
-
-class RunningCallEffect extends RunningEffect {
-    subRunning: RunningInstStream;
-    private instExecutor;
-    parentMemory;
-    private returnFunction;
-    private run;
-
-    constructor(effect: EffectType["Call"], stream: InstStream, context: RunningInstStream, run: Run) {
-        super();
-        this.parentMemory = context.localMemory;
-        this.instExecutor = context.instExecutor;
-        this.run = run;
-        this.returnFunction = (value?: MemoryValue) => {
-            if(value && effect.saveTo) this.parentMemory.set(effect.saveTo, value);
-        };
-
-        const callInfo: CallInfo = {
-            params: effect.params.map(key => {
-                const value = this.parentMemory.get(key);
-                if(value === undefined) throw `there was no param value at ${key}`;
-                return value;
-            }),
-            return: this.returnFunction
-        };
-        this.subRunning = new RunningInstStream(this.run, this.instExecutor, stream, callInfo);
-    }
-
-    progress(): boolean {
-        while(true) {
-            const result = this.subRunning.progress();
-                switch(result) {
-                case 1:
-                    break;
-                case 2:
-                    return true;
-                case undefined:
-                    return false;
-                default:
-                    this.subRunning = result;
-                    break;
-            }
-        }
-    }
-}
 
 export class InstExecutor {
     scene;
@@ -123,34 +42,15 @@ export class InstExecutor {
                     FullMemory.set(fullMemory, effect.key, getNumber(effect.value, fullMemory));
                     return false;
                 case "move": {
-                    const cards = getCards(effect.target, fullMemory, run.board);
-                    for(const card of cards) {
-                        if(effect.to) {
-                            const player = effect.to.player !== undefined ? getPlayers(effect.to.player, fullMemory).at(0) : undefined;
-                            run.boardWindow.moveCard(card, { key: effect.to.key, player});
-                        } else {
-                            run.boardWindow.moveCard(card);
-                        }
-                    }
-                    return new RunningMoveEffect(run, cards);
+                    return executeMoveEffect(this.run, effect, context);
                 }
                 case "flip":
-                    const cards = getCards(effect.target, fullMemory, run.board);
-                    for(const card of cards) {
-                        run.boardWindow.flipCard(card, Boolean(effect.isFront));
-                    }
+                    executeFlipEffect(this.run, effect, context);
                     return false;
                 case "timeout":
-                    const duration = getNumber(effect.duration, fullMemory);
-                    return new RunningTimeoutEffect(this.scene, duration);
+                    return executeTimeoutEffect(this.run, effect, context);
                 case "call":
-                    const stream = this.run.registeredStream.get(effect.stream);
-                    if(stream) {
-                        return new RunningCallEffect(effect, stream, context, this.run);
-                    } else {
-                        console.error(`stream ${effect.stream} was not found`);
-                        return false;
-                    }
+                    return executeCallEffect(this.run, effect, context);
             }
         } catch(e) {
             console.error(e);
@@ -199,7 +99,7 @@ function findEndOfLoop(index: number, stream: InstStream) {
     throw "unable to find the end of the loop";
 }
 
-class RunningInstStream {
+export class RunningInstStream {
     localMemory: Memory = new Map<MemoryKey, MemoryValue>();
     fullMemory: FullMemory;
     run;
