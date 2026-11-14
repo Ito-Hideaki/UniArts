@@ -55,7 +55,7 @@ export class GameScene extends Phaser.Scene {
 
         this.input.keyboard?.on("keydown", (e: KeyboardEvent) => {
             if(e.key.toLowerCase() === "k") {
-                run.instStreamManager.executeStream({
+                run.get.instStreamManager().executeStream({
                     body: [
                         {
                             type: "call",

@@ -1,4 +1,4 @@
-import type { Memory } from "./instexecutor";
+import type { Memory } from "./instdecoder";
 
 export class RunState {
     map: Memory;

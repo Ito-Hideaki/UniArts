@@ -1,35 +1,62 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { BinaryExpressionType, CardEntry, MemoryKey, NumberEntry, PlayerEntry } from "./inst";
-import type { Memory } from "./instexecutor";
+import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, PlayerEntry } from "./inst";
 
-function getCardsFromMemory(key: MemoryKey, memory: Memory): Card[] {
-    const raw = memory.get(key);
+export type Memory = Map<MemoryKey, MemoryValue>;
+export type FullMemory = {
+    local: Memory;
+    run: Memory;
+};
+const FullMemory = {
+    get: function(memory: FullMemory, key: MemoryKey) {
+        if(key.slice(0, 2) === "r.") {
+            return memory.run.get(key.slice(2));
+        } else {
+            return memory.local.get(key);
+        }
+    }
+};
+
+export function isMemoryCards(raw: MemoryValue | undefined): Card[] {
     if (!Array.isArray(raw)) throw "value is not array";
     const filtered = raw.filter(value => typeof value === "object");
     if(filtered.length !== raw.length) throw "value is not object array";
     return filtered;
-}
+};
 
-function getNumbersFromMemory(key: MemoryKey, memory: Memory): number[] {
-    const raw = memory.get(key);
+export function isMemoryNumArray(raw: MemoryValue | undefined): number[] {
     if (!Array.isArray(raw)) throw "value is not array";
     const filtered = raw.filter(value => typeof value === "number");
     if(filtered.length !== raw.length) throw "value is not number array";
     return filtered;
 }
 
-function getNumberFromMemory(key: MemoryKey, memory: Memory): number {
-    const raw = memory.get(key);
+export function isMemoryNumber(raw: MemoryValue | undefined): number {
     if(typeof raw !== "number") throw "value is not number";
     return raw;
+}
+
+function getCardsFromMemory(key: MemoryKey, memory: FullMemory): Card[] {
+    const raw = FullMemory.get(memory, key);
+    return isMemoryCards(raw);
+}
+
+function getNumbersFromMemory(key: MemoryKey, memory: FullMemory): number[] {
+    const raw = FullMemory.get(memory, key);
+    return isMemoryNumArray(raw);
+
+}
+
+function getNumberFromMemory(key: MemoryKey, memory: FullMemory): number {
+    const raw = FullMemory.get(memory, key);
+    return isMemoryNumber(raw);
 }
 
 export const fetchCards = getCardsFromMemory;
 export const fetchNumber = getNumberFromMemory;
 export const fetchNumArray = getNumbersFromMemory;
 
-export function getPlayers(entry: PlayerEntry, memory: Memory): number[] {
+export function getPlayers(entry: PlayerEntry, memory: FullMemory): number[] {
     if (typeof entry === "string") {
         return fetchNumArray(entry, memory);
     } else if(Array.isArray(entry)) {
@@ -46,7 +73,7 @@ export function getPlayers(entry: PlayerEntry, memory: Memory): number[] {
     }
 }
 
-export function getCards(entry: CardEntry, memory: Memory, board: Board): Card[] {
+export function getCards(entry: CardEntry, memory: FullMemory, board: Board): Card[] {
     if(typeof entry === "string") {
         return fetchCards(entry, memory);
     }
@@ -76,7 +103,7 @@ function dobinaryOperation(type: BinaryExpressionType, v1: number, v2: number): 
     }
 }
 
-export function getNumber(entry: NumberEntry, memory: Memory): number {
+export function getNumber(entry: NumberEntry, memory: FullMemory): number {
     if(typeof entry === "string") return fetchNumber(entry, memory);
     if(typeof entry === "number") return entry;
     switch(entry.type) {

@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import type { GameScene } from "../gamescene";
-import { getNumber } from "../instdecoder";
+import { Run } from "../run";
 
 export class TurnDisplay extends Phaser.GameObjects.Image {
     scene: GameScene;
@@ -11,7 +11,7 @@ export class TurnDisplay extends Phaser.GameObjects.Image {
     }
 
     update() {
-        const currentPlayer = getNumber("current_player", this.scene.getRun().state);
+        const currentPlayer = Run.getNumberState(this.scene.getRun(), "current_player");
         this.setFrame(currentPlayer === 0 ? "you" : "opponent");
     }
 }

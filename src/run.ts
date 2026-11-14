@@ -5,7 +5,9 @@ import type { GameInfo } from "./gameinfo";
 import type { CardObject } from "./gameobjects/cardobject";
 import type { PileObject } from "./gameobjects/pileobject";
 import type { GameScene } from "./gamescene";
-import { InstExecutor, InstStreamManager, type Memory } from "./instexecutor";
+import { InstExecutor, InstStreamManager } from "./instexecutor";
+import { isMemoryNumber, type Memory } from "./instdecoder";
+import type { MemoryKey } from "./inst";
 
 type PlayerPiles = { [k: string]: Pile };
 
@@ -17,6 +19,9 @@ export const Run = {
     progress: function(run: Run) {
         const instStreamManager = run.get.instStreamManager();
         instStreamManager.progress();
+    },
+    getNumberState: function(run: Run, key: MemoryKey) {
+        return isMemoryNumber(run.state.get(key));
     }
 };
 export interface Run {
@@ -64,6 +69,6 @@ export function startRun(scene: GameScene): Run {
     };
 
     const instExecutor = new InstExecutor(run);
-    getFrom.instStreamManager = new InstStreamManager(instExecutor);
+    getFrom.instStreamManager = new InstStreamManager(run, instExecutor);
     return run;
 }

@@ -2,6 +2,7 @@ import type { Card } from "./abstracts/card";
 import { findCardObject } from "./gameobjects/cardobject";
 import { isEffect, type Control, type Effect, type EffectType, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
 import { getCards, getNumber, getPlayers } from "./instdecoder";
+import type { Memory, FullMemory } from "./instdecoder";
 import type { Run } from "./run";
 
 class RunningEffect {
@@ -53,11 +54,13 @@ class RunningCallEffect extends RunningEffect {
     private instExecutor;
     parentMemory;
     private returnFunction;
+    private run;
 
-    constructor(effect: EffectType["Call"], context: RunningInstStream) {
+    constructor(effect: EffectType["Call"], context: RunningInstStream, run: Run) {
         super();
-        this.parentMemory = context.memory;
+        this.parentMemory = context.localMemory;
         this.instExecutor = context.instExecutor;
+        this.run = run;
         this.returnFunction = (value?: MemoryValue) => {
             if(value && effect.saveTo) this.parentMemory.set(effect.saveTo, value);
         };
@@ -70,7 +73,7 @@ class RunningCallEffect extends RunningEffect {
             }),
             return: this.returnFunction
         };
-        this.subRunning = new RunningInstStream(this.instExecutor, effect.stream, callInfo);
+        this.subRunning = new RunningInstStream(this.run, this.instExecutor, effect.stream, callInfo);
     }
 
     progress(): boolean {
@@ -102,27 +105,28 @@ export class InstExecutor {
 
     executeEffect(effect: Effect, context: RunningInstStream): false | RunningEffect {
         const run = this.run;
+        const fullMemory: FullMemory = { run: this.run.state, local: context.localMemory };
 
         try {
             switch(effect.type) {
                 case "test":
                     return false;
                 case "save_card":
-                    const cardsToSave = getCards(effect.target, context.memory, run.board);
-                    context.memory.set(effect.key, cardsToSave);
+                    const cardsToSave = getCards(effect.target, fullMemory, run.board);
+                    context.localMemory.set(effect.key, cardsToSave);
                     return false;
                 case "save_player":
-                    const players = getPlayers(effect.target, context.memory);
-                    context.memory.set(effect.key, players);
+                    const players = getPlayers(effect.target, fullMemory);
+                    context.localMemory.set(effect.key, players);
                     return false;
                 case "save_num":
-                    context.memory.set(effect.key, getNumber(effect.value, context.memory));
+                    context.localMemory.set(effect.key, getNumber(effect.value, fullMemory));
                     return false;
                 case "move": {
-                    const cards = getCards(effect.target, context.memory, run.board);
+                    const cards = getCards(effect.target, fullMemory, run.board);
                     for(const card of cards) {
                         if(effect.to) {
-                            const player = effect.to.player !== undefined ? getPlayers(effect.to.player, context.memory).at(0) : undefined;
+                            const player = effect.to.player !== undefined ? getPlayers(effect.to.player, fullMemory).at(0) : undefined;
                             run.boardWindow.moveCard(card, { key: effect.to.key, player});
                         } else {
                             run.boardWindow.moveCard(card);
@@ -131,16 +135,16 @@ export class InstExecutor {
                     return new RunningMoveEffect(run, cards);
                 }
                 case "flip":
-                    const cards = getCards(effect.target, context.memory, run.board);
+                    const cards = getCards(effect.target, fullMemory, run.board);
                     for(const card of cards) {
                         run.boardWindow.flipCard(card, Boolean(effect.isFront));
                     }
                     return false;
                 case "timeout":
-                    const duration = getNumber(effect.duration, context.memory);
+                    const duration = getNumber(effect.duration, fullMemory);
                     return new RunningTimeoutEffect(this.scene, duration);
                 case "call":
-                    return new RunningCallEffect(effect, context);
+                    return new RunningCallEffect(effect, context, this.run);
             }
         } catch(e) {
             console.error(e);
@@ -148,8 +152,6 @@ export class InstExecutor {
         return false;
     }
 }
-
-export type Memory = Map<MemoryKey, MemoryValue>;
 
 function findBeginningOfLoop(index: number, stream: InstStream) {
     let depth = 0;
@@ -191,26 +193,30 @@ function findEndOfLoop(index: number, stream: InstStream) {
     throw "unable to find the end of the loop";
 }
 class RunningInstStream {
-    memory: Memory = new Map<MemoryKey, MemoryValue>();
+    localMemory: Memory = new Map<MemoryKey, MemoryValue>();
+    fullMemory: FullMemory;
+    run;
     runningIndex = 0;
     runningEffect: RunningEffect | undefined;
     stream;
     instExecutor;
     callInfo;
 
-    constructor(instExecutor: InstExecutor, stream: InstStream, callInfo?: CallInfo) {
+    constructor(run: Run, instExecutor: InstExecutor, stream: InstStream, callInfo?: CallInfo) {
         this.stream = stream;
         this.instExecutor = instExecutor;
         this.callInfo = callInfo;
+        this.run = run;
+        this.fullMemory = { local: this.localMemory, run: run.state };
         if(callInfo) this.getParams(callInfo);
     }
 
     getParams(callInfo: CallInfo) {
         const aliases = this.stream.paramAliases;
         callInfo.params.forEach((param, i) => {
-            this.memory.set(`param${i}`, param);
+            this.localMemory.set(`param${i}`, param);
             if(aliases && i < aliases.length) {
-                this.memory.set(aliases[i], param);
+                this.localMemory.set(aliases[i], param);
             }
         });
     }
@@ -254,10 +260,10 @@ class RunningInstStream {
     private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
-                return new RunningInstStream(this.instExecutor, control.stream);
+                return new RunningInstStream(this.run, this.instExecutor, control.stream);
             case "return":
                 if(this.callInfo) {
-                    const returnValue = control.return ? this.memory.get(control.return) : undefined;
+                    const returnValue = control.return ? this.localMemory.get(control.return) : undefined;
                     this.callInfo.return(returnValue);
                 }
                 return undefined;
@@ -269,7 +275,7 @@ class RunningInstStream {
                 this.runningIndex = beginningIndex;
                 return this;
             case "break":
-                if (control.if !== undefined && !getNumber(control.if, this.memory)) {
+                if (control.if !== undefined && !getNumber(control.if, this.fullMemory)) {
                     this.runningIndex++;
                 } else {
                     const endIndex = findEndOfLoop(this.runningIndex, this.stream);
@@ -284,14 +290,16 @@ class RunningInstStream {
 export class InstStreamManager {
     instExecutor;
     running: RunningInstStream | undefined;
+    private run;
 
-    constructor(executor: InstExecutor) {
+    constructor(run: Run, executor: InstExecutor) {
         this.instExecutor = executor;
+        this.run = run;
     }
 
     executeStream(stream: InstStream) {
         if(this.running) throw "not finished previous stream yet";
-        this.running = new RunningInstStream(this.instExecutor, stream);
+        this.running = new RunningInstStream(this.run, this.instExecutor, stream);
     }
 
     /** @return if it's completed or not (running) */
