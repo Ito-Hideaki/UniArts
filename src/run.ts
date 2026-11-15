@@ -4,7 +4,7 @@ import type { GameInfo } from "./gameinfo";
 import type { CardObject } from "./gameobjects/cardobject";
 import type { PileObject } from "./gameobjects/pileobject";
 import type { GameScene } from "./gamescene";
-import { InstExecutor, InstStreamManager } from "./instexecutor";
+import { EffectExecutor, InstStreamManager } from "./instexecutor";
 import { isMemoryNumber, type Memory } from "./instdecoder";
 import type { InstStream, MemoryKey } from "./inst";
 
@@ -67,7 +67,7 @@ export function startRun(scene: GameScene): Run {
         scene
     };
 
-    const instExecutor = new InstExecutor(run);
-    getFrom.instStreamManager = new InstStreamManager(run, instExecutor);
+    const effectExecutor = new EffectExecutor(run);
+    getFrom.instStreamManager = new InstStreamManager(run, effectExecutor);
     return run;
 }

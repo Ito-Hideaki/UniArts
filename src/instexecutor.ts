@@ -13,7 +13,7 @@ export type CallInfo = {
     return: (value?: MemoryValue) => void;
 };
 
-export class InstExecutor {
+export class EffectExecutor {
     scene;
     run: Run;
 
@@ -106,12 +106,12 @@ export class RunningInstStream {
     runningIndex = 0;
     runningEffect: RunningEffect | undefined;
     stream;
-    instExecutor;
+    effectExecutor;
     callInfo;
 
-    constructor(run: Run, instExecutor: InstExecutor, stream: InstStream, callInfo?: CallInfo) {
+    constructor(run: Run, effectExecutor: EffectExecutor, stream: InstStream, callInfo?: CallInfo) {
         this.stream = stream;
-        this.instExecutor = instExecutor;
+        this.effectExecutor = effectExecutor;
         this.callInfo = callInfo;
         this.run = run;
         this.fullMemory = { local: this.localMemory, run: run.state };
@@ -157,7 +157,7 @@ export class RunningInstStream {
 
     /** @return if the effect is still running */
     private executeEffect(next: Effect) {
-        const runningEffect = this.instExecutor.executeEffect(next, this);
+        const runningEffect = this.effectExecutor.executeEffect(next, this);
         if(!runningEffect) return false;
         this.runningEffect = runningEffect;
         return this.runningEffect.progress();
@@ -169,7 +169,7 @@ export class RunningInstStream {
             case "jump":
                 const stream = this.run.registeredStream.get(control.stream);
                 if(stream) {
-                    return new RunningInstStream(this.run, this.instExecutor, stream);
+                    return new RunningInstStream(this.run, this.effectExecutor, stream);
                 } else {
                     console.error(`stream ${control.stream} was not found`);
                     return this;
@@ -201,18 +201,18 @@ export class RunningInstStream {
 }
 
 export class InstStreamManager {
-    instExecutor;
+    effectExecutor;
     running: RunningInstStream | undefined;
     private run;
 
-    constructor(run: Run, executor: InstExecutor) {
-        this.instExecutor = executor;
+    constructor(run: Run, executor: EffectExecutor) {
+        this.effectExecutor = executor;
         this.run = run;
     }
 
     executeStream(stream: InstStream) {
         if(this.running) throw "not finished previous stream yet";
-        this.running = new RunningInstStream(this.run, this.instExecutor, stream);
+        this.running = new RunningInstStream(this.run, this.effectExecutor, stream);
     }
 
     /** @return if it's completed or not (running) */
