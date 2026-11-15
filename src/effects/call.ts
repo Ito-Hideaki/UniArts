@@ -2,6 +2,7 @@ import { RunningEffect } from "./effect";
 import { Run } from "../run";
 import type { EffectType, InstStream, MemoryValue } from "../inst";
 import { RunningInstStream, type CallInfo } from "../instexecutor";
+import { getString } from "../instdecoder";
 
 class RunningCallEffect extends RunningEffect {
     subRunning: RunningInstStream;
@@ -14,7 +15,7 @@ class RunningCallEffect extends RunningEffect {
         this.parentMemory = context.localMemory;
         this.run = run;
         this.returnFunction = (value?: MemoryValue) => {
-            if(value && effect.saveTo) this.parentMemory.set(effect.saveTo, value);
+            if(value && effect.saveTo) this.parentMemory.set(getString(effect.saveTo), value);
         };
 
         const callInfo: CallInfo = {
@@ -47,7 +48,7 @@ class RunningCallEffect extends RunningEffect {
 }
 
 export function executeCallEffect(run: Run, effect: EffectType["Call"], context: RunningInstStream): RunningCallEffect | false {
-    const stream = run.registeredStream.get(effect.stream);
+    const stream = run.registeredStream.get(getString(effect.stream));
     if(stream) {
         return new RunningCallEffect(effect, stream, context, run);
     } else {

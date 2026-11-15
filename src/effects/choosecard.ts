@@ -4,7 +4,7 @@ import type { Card } from "../abstracts/card";
 import { CardObject, findCardObject } from "../gameobjects/cardobject";
 import type { EffectType } from "../inst";
 import type { RunningInstStream } from "../instexecutor";
-import { FullMemory } from "../instdecoder";
+import { FullMemory, getString } from "../instdecoder";
 
 class RunningChooseCardEffect extends RunningEffect {
     submitted = false;
@@ -41,7 +41,7 @@ class RunningChooseCardEffect extends RunningEffect {
             this.submitted = true;
 
             const submittedCards = selected.map(cardObject => cardObject.card);
-            FullMemory.set(this.context.fullMemory, this.effect.saveTo, submittedCards);
+            FullMemory.set(this.context.fullMemory, getString(this.effect.saveTo), submittedCards);
         }
     }
 

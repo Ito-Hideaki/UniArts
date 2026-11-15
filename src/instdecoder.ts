@@ -1,6 +1,6 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry } from "./inst";
+import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry, StringEntry } from "./inst";
 
 export type Memory = Map<MemoryKey, MemoryValue>;
 export type FullMemory = {
@@ -98,6 +98,14 @@ export function getCards(entry: CardEntry, memory: FullMemory, board: Board): Ca
         case "top":
             const sourceCards = getCards(selector.source, memory, board);
             return sourceCards.slice(-selector.max);
+    }
+}
+
+export function getString(entry: StringEntry): string {
+    if(typeof entry === "string") return entry;
+    switch(entry.type) {
+        case "join":
+            return entry.source.map(str => getString(str)).join(entry.seperator);
     }
 }
 

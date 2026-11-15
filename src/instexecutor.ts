@@ -5,7 +5,7 @@ import { executeFlipEffect } from "./effects/flip";
 import { executeMoveEffect } from "./effects/move";
 import { executeTimeoutEffect } from "./effects/timeout";
 import { isEffect, type Control, type Effect, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
-import { getCards, getNumArray, getNumber } from "./instdecoder";
+import { getCards, getNumArray, getNumber, getString } from "./instdecoder";
 import { type Memory, FullMemory } from "./instdecoder";
 import type { Run } from "./run";
 
@@ -33,14 +33,14 @@ export class EffectExecutor {
                     return false;
                 case "save_card":
                     const cardsToSave = getCards(effect.value, fullMemory, run.board);
-                    FullMemory.set(fullMemory, effect.key, cardsToSave);
+                    FullMemory.set(fullMemory, getString(effect.key), cardsToSave);
                     return false;
                 case "save_numbers":
                     const numbers = getNumArray(effect.value, fullMemory);
-                    FullMemory.set(fullMemory, effect.key, numbers);
+                    FullMemory.set(fullMemory, getString(effect.key), numbers);
                     return false;
                 case "save_num":
-                    FullMemory.set(fullMemory, effect.key, getNumber(effect.value, fullMemory));
+                    FullMemory.set(fullMemory, getString(effect.key), getNumber(effect.value, fullMemory));
                     return false;
                 case "move": {
                     return executeMoveEffect(this.run, effect, context);
@@ -168,7 +168,7 @@ export class RunningInstStream {
     private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
-                const stream = this.run.registeredStream.get(control.stream);
+                const stream = this.run.registeredStream.get(getString(control.stream));
                 if(stream) {
                     return new RunningInstStream(this.run, stream);
                 } else {
