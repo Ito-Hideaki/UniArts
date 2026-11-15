@@ -70,7 +70,12 @@ export const systemStream: { [k: string]: InstStream } = {
                     key: "hands"
                 }
             } },
-            { type: "move", target: "picked", to: { player: "r.current_player", key: "field" } }
+            { type: "move", target: "picked", to: { player: "r.current_player", key: "field" } },
+            { type: "timeout", duration: 500 },
+            { type: "call", stream: { type: "card_stream", card: "picked", stream: "onUse" }, params: [] },
+            { type: "timeout", duration: 500 },
+            { type: "move", target: "picked", to: { player: "r.current_player", key: "discarded" } },
+            { type: "timeout", duration: 500 },
         ]
     }
 };
