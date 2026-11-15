@@ -49,7 +49,7 @@ export class EffectExecutor {
                     executeFlipEffect(this.run, effect, context);
                     return false;
                 case "choose_card":
-                    return executeChooseCardEffect(this.run, getCards(effect.target, fullMemory, this.run.board));
+                    return executeChooseCardEffect(this.run, effect, context, getCards(effect.target, fullMemory, this.run.board));
                 case "timeout":
                     return executeTimeoutEffect(this.run, effect, context);
                 case "call":
