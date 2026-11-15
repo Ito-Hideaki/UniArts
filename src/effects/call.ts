@@ -14,8 +14,9 @@ class RunningCallEffect extends RunningEffect {
         super();
         this.parentMemory = context.localMemory;
         this.run = run;
+        const saveTo = effect.saveTo ? getString(effect.saveTo, context.fullMemory, run) : undefined;
         this.returnFunction = (value?: MemoryValue) => {
-            if(value && effect.saveTo) this.parentMemory.set(getString(effect.saveTo), value);
+            if(value && saveTo) this.parentMemory.set(saveTo, value);
         };
 
         const callInfo: CallInfo = {
@@ -48,11 +49,12 @@ class RunningCallEffect extends RunningEffect {
 }
 
 export function executeCallEffect(run: Run, effect: EffectType["Call"], context: RunningInstStream): RunningCallEffect | false {
-    const stream = run.registeredStream.get(getString(effect.stream));
+    const streamKey = getString(effect.stream, context.fullMemory, run);
+    const stream = run.registeredStream.get(streamKey);
     if(stream) {
         return new RunningCallEffect(effect, stream, context, run);
     } else {
-        console.error(`stream ${effect.stream} was not found`);
+        console.error(`stream ${streamKey} was not found`);
         return false;
     }
 }

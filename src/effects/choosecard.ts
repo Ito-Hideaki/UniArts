@@ -13,6 +13,7 @@ class RunningChooseCardEffect extends RunningEffect {
     context;
     submitCardButton;
     scene;
+    run;
 
     constructor(run: Run, effect: EffectType["ChooseCard"], context: RunningInstStream, cardObjects: CardObject[]) {
         super();
@@ -21,6 +22,7 @@ class RunningChooseCardEffect extends RunningEffect {
         this.context = context;
         this.submitCardButton = run.getUI("submitCardButton");
         this.scene = run.scene;
+        this.run = run;
 
         for(const cardObject of cardObjects) {
             cardObject.selectable = true;
@@ -41,7 +43,7 @@ class RunningChooseCardEffect extends RunningEffect {
             this.submitted = true;
 
             const submittedCards = selected.map(cardObject => cardObject.card);
-            FullMemory.set(this.context.fullMemory, getString(this.effect.saveTo), submittedCards);
+            FullMemory.set(this.context.fullMemory, getString(this.effect.saveTo, this.context.fullMemory, this.run), submittedCards);
         }
     }
 

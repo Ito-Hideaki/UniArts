@@ -4,6 +4,10 @@ type StringExpression = {
     type: "join",
     source: StringEntry[],
     seperator?: string
+} | {
+    type: "card_stream",
+    card: CardEntry,
+    stream: StringEntry
 };
 export type StringEntry = string | StringExpression;
 

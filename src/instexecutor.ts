@@ -33,14 +33,14 @@ export class EffectExecutor {
                     return false;
                 case "save_card":
                     const cardsToSave = getCards(effect.value, fullMemory, run.board);
-                    FullMemory.set(fullMemory, getString(effect.key), cardsToSave);
+                    FullMemory.set(fullMemory, getString(effect.key, fullMemory, run), cardsToSave);
                     return false;
                 case "save_numbers":
                     const numbers = getNumArray(effect.value, fullMemory);
-                    FullMemory.set(fullMemory, getString(effect.key), numbers);
+                    FullMemory.set(fullMemory, getString(effect.key, fullMemory, run), numbers);
                     return false;
                 case "save_num":
-                    FullMemory.set(fullMemory, getString(effect.key), getNumber(effect.value, fullMemory));
+                    FullMemory.set(fullMemory, getString(effect.key, fullMemory, run), getNumber(effect.value, fullMemory));
                     return false;
                 case "move": {
                     return executeMoveEffect(this.run, effect, context);
@@ -168,7 +168,7 @@ export class RunningInstStream {
     private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
-                const stream = this.run.registeredStream.get(getString(control.stream));
+                const stream = this.run.registeredStream.get(getString(control.stream, this.fullMemory, this.run));
                 if(stream) {
                     return new RunningInstStream(this.run, stream);
                 } else {

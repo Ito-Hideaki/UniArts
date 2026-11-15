@@ -28,7 +28,7 @@ export const CARD_DATA: { [k: string]: CardData } = {
                                 type: "pile",
                                 pile: {
                                     key: "deck",
-                                    player: "player"
+                                    player: "r.current_player"
                                 }
                             }
                         },
