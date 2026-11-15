@@ -37,6 +37,7 @@ export const systemStream: { [k: string]: InstStream } = {
     },
     deal_hands: {
         body: [
+            { type: "save_num", value: 1, key: "r.current_player" },
             { type: "save_num", value: 0, key: "pi" },
             { type: "loop" },
                 { type: "save_num", value: 0, key: "i" },
@@ -52,7 +53,7 @@ export const systemStream: { [k: string]: InstStream } = {
                 { type: "break", if: { type: "==", v1: "pi", v2: 2 } },
             { type: "end_loop" },
             { type: "choose_card", saveTo: "picked", target: { type: "pile", pile: { player: "r.current_player", key: "hands" } } },
-            { type: "move", target: "picked", to: { player: "r.current_player", key: "discarded" } }
+            { type: "move", target: "picked", to: { player: "r.current_player", key: "field" } }
         ]
     },
 };

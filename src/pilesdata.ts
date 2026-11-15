@@ -17,17 +17,23 @@ function createPiles0(scene: GameScene) {
     const discardedObject = new PileObject(scene, discarded, 1600, 800);
     discardedObject.cardGap.y = -5;
 
+    const field = new Pile(0);
+    const fieldObject = new PileObject(scene, field, 700, 700);
+    fieldObject.cardGap.x = 200;
+
     return {
         piles: {
             deck,
             hands,
-            discarded
+            discarded,
+            field
         },
         pileObjects: {
             deck: deckObject,
             hands: handsObject,
-            discarded: discardedObject
-        }
+            discarded: discardedObject,
+            field: fieldObject
+        },
     }
 }
 
@@ -48,16 +54,22 @@ function createPiles1(scene: GameScene) {
     const discardedObject = new PileObject(scene, discarded, screenH - 1600, screenW - 800);
     discardedObject.cardGap.y = 5;
 
+    const field = new Pile(0);
+    const fieldObject = new PileObject(scene, field, screenW - 700, screenH - 700);
+    fieldObject.cardGap.x = -200;
+
     return {
         piles: {
             deck,
             hands,
-            discarded
+            discarded,
+            field
         },
         pileObjects: {
             deck: deckObject,
             hands: handsObject,
-            discarded: discardedObject
+            discarded: discardedObject,
+            field: fieldObject
         }
     }
 }
