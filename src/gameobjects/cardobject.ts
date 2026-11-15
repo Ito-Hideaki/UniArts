@@ -11,6 +11,7 @@ export class CardObject extends Phaser.GameObjects.Image {
     card;
     velocity = new Phaser.Math.Vector2();
     isMoving = false;
+    selectable = false;
     selected = false;
     clickNotifier;
     run: Run;
@@ -39,6 +40,8 @@ export class CardObject extends Phaser.GameObjects.Image {
     }
 
     update(_: number, delta_ms: number) {
+        if(!this.selectable) this.selected = false;
+
         this.updateFrame();
 
         if(this.card.pile) {

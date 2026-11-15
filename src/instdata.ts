@@ -50,7 +50,8 @@ export const systemStream: { [k: string]: InstStream } = {
 
                 { type: "save_num", key: "pi", value: { type: "+", v1: "pi", v2: 1 } },
                 { type: "break", if: { type: "==", v1: "pi", v2: 2 } },
-            { type: "end_loop" }
+            { type: "end_loop" },
+            { type: "choose_card", target: { type: "pile", pile: { player: ["r.current_player"], key: "hands" } } }
         ]
     },
 };

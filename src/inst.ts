@@ -55,6 +55,10 @@ export type EffectType = {
         target: CardEntry;
         isFront: NumberEntry;
     },
+    ChooseCard: {
+        type: "choose_card";
+        target: CardEntry;
+    },
     SaveCard: {
         type: "save_card";
         target: CardEntry;
@@ -106,6 +110,7 @@ export type ControlType = {
 export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "flip",
     "move",
+    "choose_card",
     "save_card",
     "save_player",
     "save_num",

@@ -1,4 +1,5 @@
 import { executeCallEffect } from "./effects/call";
+import { executeChooseCardEffect } from "./effects/chooseCard";
 import { RunningEffect } from "./effects/effect";
 import { executeFlipEffect } from "./effects/flip";
 import { executeMoveEffect } from "./effects/move";
@@ -47,6 +48,8 @@ export class EffectExecutor {
                 case "flip":
                     executeFlipEffect(this.run, effect, context);
                     return false;
+                case "choose_card":
+                    return executeChooseCardEffect(this.run, getCards(effect.target, fullMemory, this.run.board));
                 case "timeout":
                     return executeTimeoutEffect(this.run, effect, context);
                 case "call":
