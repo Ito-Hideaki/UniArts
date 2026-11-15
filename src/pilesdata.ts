@@ -51,7 +51,7 @@ function createPiles1(scene: GameScene) {
     handsObject.bottomAdjustment.x = 0.5;
 
     const discarded = new Pile(1);
-    const discardedObject = new PileObject(scene, discarded, screenH - 1600, screenW - 800);
+    const discardedObject = new PileObject(scene, discarded, screenW - 1600, screenH - 800);
     discardedObject.cardGap.y = 5;
 
     const field = new Pile(0);
