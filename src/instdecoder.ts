@@ -1,6 +1,6 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, PlayerEntry } from "./inst";
+import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry } from "./inst";
 
 export type Memory = Map<MemoryKey, MemoryValue>;
 export type FullMemory = {
@@ -63,7 +63,7 @@ export const fetchCards = getCardsFromMemory;
 export const fetchNumber = getNumberFromMemory;
 export const fetchNumArray = getNumbersFromMemory;
 
-export function getPlayers(entry: PlayerEntry, memory: FullMemory): number[] {
+export function getNumArray(entry: NumbersEntry, memory: FullMemory): number[] {
     if (typeof entry === "string") {
         return fetchNumArray(entry, memory);
     } else if(Array.isArray(entry)) {
@@ -71,7 +71,7 @@ export function getPlayers(entry: PlayerEntry, memory: FullMemory): number[] {
     } else {
         switch(entry.type) {
             case "at":
-                const source = getPlayers(entry.source, memory);
+                const source = getNumArray(entry.source, memory);
                 const index = getNumber(entry.index, memory);
                 const result = source.at(index);
                 if(result === undefined) throw "index is not valid";
@@ -88,7 +88,7 @@ export function getCards(entry: CardEntry, memory: FullMemory, board: Board): Ca
     switch(selector.type) {
         case "pile":
             if(typeof selector.pile !== "string" && selector.pile.player !== undefined) {
-                const player = getPlayers(selector.pile.player, memory).at(0);
+                const player = getNumber(selector.pile.player, memory);
                 if(player === undefined) {
                     console.error("found no player to choose pile from");
                     return [];

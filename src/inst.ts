@@ -8,19 +8,17 @@ type BinaryExpression = {
 };
 type Expression = BinaryExpression;
 export type NumberEntry = number | MemoryKey | Expression;
+export type NumbersEntry = NumberEntry[] | MemoryKey | {
+    type: "at";
+    source: NumbersEntry;
+    index: NumberEntry;
+};
 
 export type PileSelector = {
-    player: PlayerEntry;
+    player: NumberEntry;
     key: string;
 };
 export type PileEntry = PileSelector;
-
-export type PlayerSelector = NumberEntry[] | {
-    type: "at";
-    source: PlayerEntry;
-    index: NumberEntry;
-};
-export type PlayerEntry = PlayerSelector | MemoryKey;
 
 export type SelectorType = {
     Pile: {
@@ -65,9 +63,9 @@ export type EffectType = {
         target: CardEntry;
         key: MemoryKey;
     },
-    SavePlayer: {
-        type: "save_player";
-        target: PlayerEntry;
+    SaveNumbers: {
+        type: "save_numbers";
+        target: NumbersEntry;
         key: MemoryKey;
     },
     SaveNumber: {
@@ -113,7 +111,7 @@ export const EFFECT_TYPES: EffectType[keyof EffectType]["type"][] = [
     "move",
     "choose_card",
     "save_card",
-    "save_player",
+    "save_numbers",
     "save_num",
     "test",
     "timeout",

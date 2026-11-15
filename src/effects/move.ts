@@ -2,7 +2,7 @@ import { RunningEffect } from "./effect";
 import { Run } from "../run";
 import type { Card } from "../abstracts/card";
 import { findCardObject } from "../gameobjects/cardobject";
-import { getCards, getPlayers } from "../instdecoder";
+import { getCards, getNumber } from "../instdecoder";
 import type { EffectType } from "../inst";
 import type { RunningInstStream } from "../instexecutor";
 
@@ -25,7 +25,7 @@ export function executeMoveEffect(run: Run, effect: EffectType["Move"], context:
     const cards = getCards(effect.target, context.fullMemory, run.board);
     for(const card of cards) {
         if(effect.to) {
-            const player = effect.to.player !== undefined ? getPlayers(effect.to.player, context.fullMemory).at(0) : undefined;
+            const player = effect.to.player !== undefined ? getNumber(effect.to.player, context.fullMemory) : undefined;
             run.board.moveCard(card, { key: effect.to.key, player});
         } else {
             run.board.moveCard(card);

@@ -5,7 +5,7 @@ import { executeFlipEffect } from "./effects/flip";
 import { executeMoveEffect } from "./effects/move";
 import { executeTimeoutEffect } from "./effects/timeout";
 import { isEffect, type Control, type Effect, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
-import { getCards, getNumber, getPlayers } from "./instdecoder";
+import { getCards, getNumArray, getNumber } from "./instdecoder";
 import { type Memory, FullMemory } from "./instdecoder";
 import type { Run } from "./run";
 
@@ -35,9 +35,9 @@ export class EffectExecutor {
                     const cardsToSave = getCards(effect.target, fullMemory, run.board);
                     FullMemory.set(fullMemory, effect.key, cardsToSave);
                     return false;
-                case "save_player":
-                    const players = getPlayers(effect.target, fullMemory);
-                    FullMemory.set(fullMemory, effect.key, players);
+                case "save_numbers":
+                    const numbers = getNumArray(effect.target, fullMemory);
+                    FullMemory.set(fullMemory, effect.key, numbers);
                     return false;
                 case "save_num":
                     FullMemory.set(fullMemory, effect.key, getNumber(effect.value, fullMemory));
