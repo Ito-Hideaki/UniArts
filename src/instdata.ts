@@ -31,13 +31,20 @@ export const commonStream: { [k: string]: InstStream } = {
 
 export const systemStream: { [k: string]: InstStream } = {
     start: {
-            body: [
-                { type: "jump", stream: "system.deal_hands" }
-            ]
+        body: [
+            { type: "call", stream: "system.deal_hands", params: [] },
+            { type: "loop" },
+                { type: "save_num", value: 0, key: "r.current_player" },
+                { type: "loop" },
+                    { type: "call", stream: "system.play_from_hands", params: [] },
+                    { type: "save_num", key: "r.current_player", value: { type: "+", v1: "r.current_player", v2: 1 }},
+                    { type: "break", if: { type: "==", v1: "r.current_player", v2: 2 } },
+                { type: "end_loop" },
+            { type: "end_loop" },
+        ]
     },
     deal_hands: {
         body: [
-            { type: "save_num", value: 1, key: "r.current_player" },
             { type: "save_num", value: 0, key: "pi" },
             { type: "loop" },
                 { type: "save_num", value: 0, key: "i" },
@@ -52,8 +59,18 @@ export const systemStream: { [k: string]: InstStream } = {
                 { type: "save_num", key: "pi", value: { type: "+", v1: "pi", v2: 1 } },
                 { type: "break", if: { type: "==", v1: "pi", v2: 2 } },
             { type: "end_loop" },
-            { type: "choose_card", saveTo: "picked", target: { type: "pile", pile: { player: "r.current_player", key: "hands" } } },
-            { type: "move", target: "picked", to: { player: "r.current_player", key: "field" } }
         ]
     },
+    play_from_hands: {
+        body: [
+            { type: "choose_card", saveTo: "picked", target: {
+                type: "pile",
+                pile: {
+                    player: "r.current_player",
+                    key: "hands"
+                }
+            } },
+            { type: "move", target: "picked", to: { player: "r.current_player", key: "field" } }
+        ]
+    }
 };

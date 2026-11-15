@@ -2,12 +2,12 @@ import Phaser from "phaser";
 import { CardObject } from "./gameobjects/cardobject";
 import type { Card } from "./abstracts/card";
 import { createPilesList } from "./pilesdata";
-import { addCardTextureFrames } from "./cardtexture";
+import { addCardTextureFrames } from "./texture/cardtexture";
 import { commonStream, systemStream } from "./instdata";
 import { vPath } from "./util";
 import { TurnDisplay } from "./gameobjects/turndisplay";
 import { Run, startRun } from "./run";
-import { addButtonTexture } from "./buttontexture";
+import { addButtonTexture } from "./texture/buttontexture";
 import { SubmitCardButton } from "./gameobjects/submitcardbutton";
 
 export class GameScene extends Phaser.Scene {
