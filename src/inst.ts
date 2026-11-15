@@ -70,7 +70,7 @@ export type EffectType = {
     },
     SaveNumber: {
         type: "save_num";
-        value: NumberEntry;
+        target: NumberEntry;
         key: MemoryKey;
     },
     Timeout: {
