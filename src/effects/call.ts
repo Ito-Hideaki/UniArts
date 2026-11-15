@@ -5,7 +5,6 @@ import { RunningInstStream, type CallInfo } from "../instexecutor";
 
 class RunningCallEffect extends RunningEffect {
     subRunning: RunningInstStream;
-    private effectExecutor;
     parentMemory;
     private returnFunction;
     private run;
@@ -13,7 +12,6 @@ class RunningCallEffect extends RunningEffect {
     constructor(effect: EffectType["Call"], stream: InstStream, context: RunningInstStream, run: Run) {
         super();
         this.parentMemory = context.localMemory;
-        this.effectExecutor = context.effectExecutor;
         this.run = run;
         this.returnFunction = (value?: MemoryValue) => {
             if(value && effect.saveTo) this.parentMemory.set(effect.saveTo, value);
@@ -27,7 +25,7 @@ class RunningCallEffect extends RunningEffect {
             }),
             return: this.returnFunction
         };
-        this.subRunning = new RunningInstStream(this.run, this.effectExecutor, stream, callInfo);
+        this.subRunning = new RunningInstStream(this.run, stream, callInfo);
     }
 
     progress(): boolean {

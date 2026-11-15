@@ -30,7 +30,8 @@ export interface Run {
     board: Board;
     info: GameInfo;
     get: {
-        instStreamManager: () => InstStreamManager
+        instStreamManager: () => InstStreamManager;
+        effectExecutor: () => EffectExecutor;
     };
     state: Memory;
     scene: Phaser.Scene;
@@ -40,6 +41,7 @@ export interface Run {
 export function startRun(scene: GameScene): Run {
     const getFrom: {
         instStreamManager?: InstStreamManager;
+        effectExecutor?: EffectExecutor;
     } = {};
     const info: GameInfo = {
         playerNum: 2
@@ -61,13 +63,17 @@ export function startRun(scene: GameScene): Run {
             instStreamManager: () => {
                 if(!getFrom.instStreamManager) throw "getFrom.instStreamManager is not initialized";
                 return getFrom.instStreamManager;
-            }
+            },
+            effectExecutor: () => {
+                if(!getFrom.effectExecutor) throw "getFrom.effectExecutor is not initialized";
+                return getFrom.effectExecutor;
+            },
         },
         state,
         scene
     };
 
-    const effectExecutor = new EffectExecutor(run);
-    getFrom.instStreamManager = new InstStreamManager(run, effectExecutor);
+    getFrom.effectExecutor = new EffectExecutor(run);
+    getFrom.instStreamManager = new InstStreamManager(run);
     return run;
 }

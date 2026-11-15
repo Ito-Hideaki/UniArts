@@ -106,12 +106,10 @@ export class RunningInstStream {
     runningIndex = 0;
     runningEffect: RunningEffect | undefined;
     stream;
-    effectExecutor;
     callInfo;
 
-    constructor(run: Run, effectExecutor: EffectExecutor, stream: InstStream, callInfo?: CallInfo) {
+    constructor(run: Run, stream: InstStream, callInfo?: CallInfo) {
         this.stream = stream;
-        this.effectExecutor = effectExecutor;
         this.callInfo = callInfo;
         this.run = run;
         this.fullMemory = { local: this.localMemory, run: run.state };
@@ -157,7 +155,7 @@ export class RunningInstStream {
 
     /** @return if the effect is still running */
     private executeEffect(next: Effect) {
-        const runningEffect = this.effectExecutor.executeEffect(next, this);
+        const runningEffect = this.run.get.effectExecutor().executeEffect(next, this);
         if(!runningEffect) return false;
         this.runningEffect = runningEffect;
         return this.runningEffect.progress();
@@ -169,7 +167,7 @@ export class RunningInstStream {
             case "jump":
                 const stream = this.run.registeredStream.get(control.stream);
                 if(stream) {
-                    return new RunningInstStream(this.run, this.effectExecutor, stream);
+                    return new RunningInstStream(this.run, stream);
                 } else {
                     console.error(`stream ${control.stream} was not found`);
                     return this;
@@ -201,18 +199,16 @@ export class RunningInstStream {
 }
 
 export class InstStreamManager {
-    effectExecutor;
     running: RunningInstStream | undefined;
     private run;
 
-    constructor(run: Run, executor: EffectExecutor) {
-        this.effectExecutor = executor;
+    constructor(run: Run) {
         this.run = run;
     }
 
     executeStream(stream: InstStream) {
         if(this.running) throw "not finished previous stream yet";
-        this.running = new RunningInstStream(this.run, this.effectExecutor, stream);
+        this.running = new RunningInstStream(this.run, stream);
     }
 
     /** @return if it's completed or not (running) */
