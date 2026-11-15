@@ -9,7 +9,7 @@ export const commonStream: { [k: string]: InstStream } = {
         body: [
             {
                 type: "save_card",
-                target: {
+                value: {
                     type: "top",
                     max: 1,
                     source: {

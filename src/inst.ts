@@ -60,17 +60,17 @@ export type EffectType = {
     },
     SaveCard: {
         type: "save_card";
-        target: CardEntry;
+        value: CardEntry;
         key: MemoryKey;
     },
     SaveNumbers: {
         type: "save_numbers";
-        target: NumbersEntry;
+        value: NumbersEntry;
         key: MemoryKey;
     },
     SaveNumber: {
         type: "save_num";
-        target: NumberEntry;
+        value: NumberEntry;
         key: MemoryKey;
     },
     Timeout: {

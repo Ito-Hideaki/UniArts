@@ -32,11 +32,11 @@ export class EffectExecutor {
                 case "test":
                     return false;
                 case "save_card":
-                    const cardsToSave = getCards(effect.target, fullMemory, run.board);
+                    const cardsToSave = getCards(effect.value, fullMemory, run.board);
                     FullMemory.set(fullMemory, effect.key, cardsToSave);
                     return false;
                 case "save_numbers":
-                    const numbers = getNumArray(effect.target, fullMemory);
+                    const numbers = getNumArray(effect.value, fullMemory);
                     FullMemory.set(fullMemory, effect.key, numbers);
                     return false;
                 case "save_num":
