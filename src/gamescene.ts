@@ -81,10 +81,15 @@ export class GameScene extends Phaser.Scene {
                     ]
                 });
             }
+
+            if(e.key.toLowerCase() === "r") {
+                this.scene.start("game");
+            }
         });
 
         this.events.once("shutdown", () => {
             this.events.off("update");
+            this.input.keyboard?.off("keydown");
         });
     }
 
