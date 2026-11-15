@@ -28,15 +28,13 @@ export class CardObject extends Phaser.GameObjects.Image {
 
         this.setInteractive();
         this.clickNotifier = new ClickNotifier(this, this.onClick.bind(this));
+        this.on("destroy", () => {
+            this.clickNotifier.removeEvents();
+        }, this);
     }
 
     onClick() {
         this.selected = !this.selected;
-    }
-
-    destroy(fromScene?: boolean): void {
-        super.destroy(fromScene);
-        this.clickNotifier.removeEvents();
     }
 
     update(_: number, delta_ms: number) {
