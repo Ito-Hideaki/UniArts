@@ -46,7 +46,7 @@ export class GameScene extends Phaser.Scene {
         for(let pID = 0; pID < run.info.playerNum; pID++) {
             for(let i = 0; i < 10; i++) {
                 const card: Card = run.board.createCard({ name: "foo" }, { isFront: false });
-                const cardObject = new CardObject(this, run, card);
+                const cardObject = new CardObject(run, card);
                 this.add.existing(cardObject);
                 run.cardObjects.add(cardObject);
                 run.board.moveCard(card, { key: "deck", player: pID });

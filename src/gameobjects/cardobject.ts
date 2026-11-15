@@ -1,27 +1,24 @@
 import Phaser from "phaser";
 import type { Card } from "../abstracts/card";
-import type { GameScene } from "../gamescene";
 import { findPileObject } from "./pileobject";
 import type { Pile } from "../abstracts/pile";
 import type { Run } from "../run";
 
 export class CardObject extends Phaser.GameObjects.Image {
     card;
-    scene: GameScene;
     velocity = new Phaser.Math.Vector2();
     isMoving = false;
     run: Run;
 
-    constructor(scene: GameScene, run: Run, card: Card) {
-        super(scene, 0, 0, "card");
-        this.scene = scene;
+    constructor(run: Run, card: Card) {
+        super(run.scene, 0, 0, "card");
         this.card = card;
         this.run = run;
 
         this.setOrigin(0.5, 0.5);
         this.setScale(2.5);
 
-        scene.events.on("update", this.update, this);
+        run.scene.events.on("update", this.update, this);
     }
 
     update(_: number, delta_ms: number) {
