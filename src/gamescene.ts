@@ -9,6 +9,7 @@ import { TurnDisplay } from "./gameobjects/turndisplay";
 import { Run, startRun } from "./run";
 import { addButtonTexture } from "./texture/buttontexture";
 import { SubmitCardButton } from "./gameobjects/submitcardbutton";
+import { CARD_DATA } from "./gamedata/carddata";
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -54,7 +55,7 @@ export class GameScene extends Phaser.Scene {
 
         for(let pID = 0; pID < run.info.playerNum; pID++) {
             for(let i = 0; i < 10; i++) {
-                const card: Card = run.board.createCard({ name: "foo", id: "foo", stream: {} }, { isFront: false });
+                const card: Card = run.board.createCard(CARD_DATA.sample.info, { isFront: false });
                 const cardObject = new CardObject(run, card);
                 this.add.existing(cardObject);
                 run.cardObjects.add(cardObject);
@@ -67,6 +68,12 @@ export class GameScene extends Phaser.Scene {
         }
         for(const key in systemStream) {
             run.registeredStream.set("system." + key, systemStream[key]);
+        }
+        for(const key in CARD_DATA) {
+            const data = CARD_DATA[key];
+            for(const streamKey in data.stream) {
+                run.registeredStream.set(`${key}_${streamKey}`, data.stream[streamKey]);
+            }
         }
 
         this.input.keyboard?.on("keydown", (e: KeyboardEvent) => {
