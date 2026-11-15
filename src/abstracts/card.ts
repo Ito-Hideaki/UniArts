@@ -5,6 +5,7 @@ export type TriggerString = "onUse";
 export interface CardInfo {
     id: string;
     name: string;
+    imageFrame: string;
     stream: {
         [k in TriggerString]?: string;
     }

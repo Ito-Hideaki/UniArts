@@ -12,6 +12,7 @@ export const CARD_DATA: { [k: string]: CardData } = {
         info: {
             id: "sample",
             name: "サンプル",
+            imageFrame: "sword",
             stream: {
                 onUse: "sample_onUse"
             }

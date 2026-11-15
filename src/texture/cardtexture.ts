@@ -4,7 +4,7 @@ export const CARD_TEXTURE_DATA = {
     cardWidth: 70,
     cardHeight: 100,
     cardsPerRow: 10,
-    keys: ["back", "attack1", "attack2"]
+    keys: ["back", "frame", "sword", "shuriken"]
 };
 
 function getTextureWidth() {

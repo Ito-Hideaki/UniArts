@@ -58,7 +58,7 @@ export class CardObject extends Phaser.GameObjects.Image {
 
     private updateFrame() {
         if(this.card.state.isFront) {
-            this.setFrame("attack1");
+            this.setFrame(this.card.info.imageFrame);
         } else this.setFrame("back");
     }
 
