@@ -1,8 +1,13 @@
 import type { Board } from "./board";
 import type { Pile } from "./pile";
 
-export type CardInfo = {
+export type TriggerString = "onUse";
+export interface CardInfo {
+    id: string;
     name: string;
+    stream: {
+        [k in TriggerString]?: string;
+    }
 }
 
 export type CardState = {

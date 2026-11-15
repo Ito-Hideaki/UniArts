@@ -54,7 +54,7 @@ export class GameScene extends Phaser.Scene {
 
         for(let pID = 0; pID < run.info.playerNum; pID++) {
             for(let i = 0; i < 10; i++) {
-                const card: Card = run.board.createCard({ name: "foo" }, { isFront: false });
+                const card: Card = run.board.createCard({ name: "foo", id: "foo", stream: {} }, { isFront: false });
                 const cardObject = new CardObject(run, card);
                 this.add.existing(cardObject);
                 run.cardObjects.add(cardObject);
