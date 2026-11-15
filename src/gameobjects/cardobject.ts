@@ -22,7 +22,7 @@ export class CardObject extends Phaser.GameObjects.Image {
         this.run = run;
 
         this.setOrigin(0.5, 0.5);
-        this.setScale(2.5);
+        this.setScale(2);
 
         run.scene.events.on("update", this.update, this);
 
