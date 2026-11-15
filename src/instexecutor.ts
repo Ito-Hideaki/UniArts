@@ -1,5 +1,5 @@
 import { executeCallEffect } from "./effects/call";
-import { executeChooseCardEffect } from "./effects/chooseCard";
+import { executeChooseCardEffect } from "./effects/choosecard";
 import { RunningEffect } from "./effects/effect";
 import { executeFlipEffect } from "./effects/flip";
 import { executeMoveEffect } from "./effects/move";

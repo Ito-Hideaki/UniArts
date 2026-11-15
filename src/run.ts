@@ -33,6 +33,7 @@ export interface Run {
         instStreamManager: () => InstStreamManager;
         effectExecutor: () => EffectExecutor;
     };
+    getUI: GameScene["getUI"];
     state: Memory;
     scene: Phaser.Scene;
     registeredStream: Map<string, InstStream>;
@@ -69,6 +70,7 @@ export function startRun(scene: GameScene): Run {
                 return getFrom.effectExecutor;
             },
         },
+        getUI: scene.getUI.bind(scene),
         state,
         scene
     };

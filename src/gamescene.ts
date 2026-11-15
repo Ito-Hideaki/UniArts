@@ -7,6 +7,8 @@ import { commonStream, systemStream } from "./instdata";
 import { vPath } from "./util";
 import { TurnDisplay } from "./gameobjects/turndisplay";
 import { Run, startRun } from "./run";
+import { addButtonTexture } from "./buttontexture";
+import { SubmitCardButton } from "./gameobjects/submitcardbutton";
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -14,6 +16,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     private run: Run | undefined;
+    ui: {
+        submitCardButton?: SubmitCardButton
+    } = {};
 
     preload() {
         this.load.image("card", vPath("/image/card.png"));
@@ -27,13 +32,17 @@ export class GameScene extends Phaser.Scene {
             texture.add("opponent", 0, 0, 0, 300, 100);
             texture.add("you", 0, 0, 100, 300, 100);
         });
+        this.load.image("button", vPath("/image/button.png"));
+        this.load.once("complete", () => addButtonTexture(this));
     }
 
     create() {
+        this.ui.submitCardButton = new SubmitCardButton(this, 1500, 700);
+        this.add.existing(this.ui.submitCardButton);
+        this.add.existing(new TurnDisplay(this, 200, 500));
+
         const run = startRun(this);
         this.run = run;
-
-        this.add.existing(new TurnDisplay(this, 200, 500));
 
         run.piles.forEach((targetPlayerPiles, pID) => {
             const { piles: sourcePlayerPiles, pileObjects } = createPilesList[pID](this);
@@ -86,5 +95,12 @@ export class GameScene extends Phaser.Scene {
     getRun() {
         if(!this.run) throw "run is not set";
         return this.run;
+    }
+    getUI<T extends keyof GameScene["ui"]>(key: T) {
+        const ui = this.ui[key];
+        if(!ui) {
+            throw `scene UI ${key} is not initialized`;
+        }
+        return ui;
     }
 }
