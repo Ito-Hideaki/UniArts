@@ -58,6 +58,7 @@ export type EffectType = {
     ChooseCard: {
         type: "choose_card";
         target: CardEntry;
+        saveTo: MemoryKey;
     },
     SaveCard: {
         type: "save_card";
