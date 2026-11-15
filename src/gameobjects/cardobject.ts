@@ -7,6 +7,29 @@ import { ClickNotifier } from "./clickdetector";
 
 export type CardSelectionListener = (card: Card) => void;
 
+class CardOutline extends Phaser.GameObjects.Image {
+    cardObject;
+    back;
+
+    constructor(scene: Phaser.Scene, cardObject: CardObject) {
+        super(scene, 0, 0, "card", "frame");
+        this.cardObject = cardObject;
+        this.back = cardObject.texture.get("back");
+    }
+
+    update() {
+        if(this.cardObject.frame === this.back) {
+            this.setVisible(false);
+        } else {
+            this.setVisible(true);
+            this.x = this.cardObject.x;
+            this.y = this.cardObject.y;
+            this.scale = this.cardObject.scale;
+            this.depth = this.cardObject.depth + 0.01;
+        }
+    }
+}
+
 export class CardObject extends Phaser.GameObjects.Image {
     card;
     velocity = new Phaser.Math.Vector2();
@@ -15,6 +38,7 @@ export class CardObject extends Phaser.GameObjects.Image {
     selected = false;
     clickNotifier;
     run: Run;
+    outlineObject;
 
     constructor(run: Run, card: Card) {
         super(run.scene, 0, 0, "card");
@@ -23,6 +47,8 @@ export class CardObject extends Phaser.GameObjects.Image {
 
         this.setOrigin(0.5, 0.5);
         this.setScale(2);
+        this.outlineObject = new CardOutline(this.scene, this);
+        this.scene.add.existing(this.outlineObject);
 
         run.scene.events.on("update", this.update, this);
 
@@ -54,6 +80,8 @@ export class CardObject extends Phaser.GameObjects.Image {
                 this.updateDepth(delta_ms, dest.depth, dest.x);
             }
         }
+
+        this.outlineObject.update();
     }
 
     private updateFrame() {
