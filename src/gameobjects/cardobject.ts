@@ -3,11 +3,16 @@ import type { Card } from "../abstracts/card";
 import { findPileObject } from "./pileobject";
 import type { Pile } from "../abstracts/pile";
 import type { Run } from "../run";
+import { ClickNotifier } from "./clickdetector";
+
+export type CardSelectionListener = (card: Card) => void;
 
 export class CardObject extends Phaser.GameObjects.Image {
     card;
     velocity = new Phaser.Math.Vector2();
     isMoving = false;
+    selected = false;
+    clickNotifier;
     run: Run;
 
     constructor(run: Run, card: Card) {
@@ -19,14 +24,31 @@ export class CardObject extends Phaser.GameObjects.Image {
         this.setScale(2.5);
 
         run.scene.events.on("update", this.update, this);
+
+        this.setInteractive();
+        this.clickNotifier = new ClickNotifier(this, this.onClick.bind(this));
+    }
+
+    onClick() {
+        this.selected = !this.selected;
+    }
+
+    destroy(fromScene?: boolean): void {
+        super.destroy(fromScene);
+        this.clickNotifier.removeEvents();
     }
 
     update(_: number, delta_ms: number) {
         this.updateFrame();
 
         if(this.card.pile) {
-            const dest = this.getDestinationFromPile(this.card.pile);
-            if(dest) {
+            const baseDest = this.getDestinationFromPile(this.card.pile);
+            if(baseDest) {
+                const dest = {
+                    depth: baseDest.depth,
+                    x: baseDest.x,
+                    y: baseDest.y + (this.selected ? -50 : 0)
+                };
                 this.updatePosition(delta_ms, dest);
                 this.updateDepth(delta_ms, dest.depth, dest.x);
             }
