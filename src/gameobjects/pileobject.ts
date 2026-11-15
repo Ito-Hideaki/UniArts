@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { Pile } from "./../abstracts/pile";
 import type { Card } from "./../abstracts/card";
+import { RENDERING_DEPTH } from "./depth";
 
 export class PileObject extends Phaser.GameObjects.Image {
     pile;
@@ -32,7 +33,7 @@ export class PileObject extends Phaser.GameObjects.Image {
     getCardDepth(card: Card) {
         const index = this.pile.cards.indexOf(card);
         if(index === -1) throw "the card was not in the pile";
-        return index;
+        return RENDERING_DEPTH.CARD + index;
     }
 }
 

@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { GameScene } from "../gamescene";
 import { ClickNotifier } from "./clickdetector";
+import { RENDERING_DEPTH } from "./depth";
 
 const ButtonJobType = {
     None: "none",
@@ -15,6 +16,7 @@ export class SubmitCardButton extends Phaser.GameObjects.Image {
 
     constructor(scene: GameScene, x: number, y: number) {
         super(scene, x, y, "button");
+        this.setDepth(RENDERING_DEPTH.UI);
         scene.events.on("update", this.update, this);
         this.setInteractive();
         this.clickNotifier = new ClickNotifier(this, this.onClick.bind(this));
