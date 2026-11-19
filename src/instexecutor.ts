@@ -5,7 +5,7 @@ import { executeFlipEffect } from "./effects/flip";
 import { executeMoveEffect } from "./effects/move";
 import { executeTimeoutEffect } from "./effects/timeout";
 import { isEffect, type Control, type Effect, type InstStream, type MemoryKey, type MemoryValue } from "./inst";
-import { getCards, getNumArray, getNumber } from "./instdecoder";
+import { getCards, getNumArray, getNumber, getStreamKey } from "./instdecoder";
 import { type Memory, FullMemory } from "./instdecoder";
 import type { Run } from "./run";
 
@@ -168,7 +168,7 @@ export class RunningInstStream {
     private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
-                const streamKey = FullMemory.getKeyFromEntry(this.fullMemory, control.stream);
+                const streamKey = getStreamKey(control.stream, this.fullMemory, this.run);
                 const stream = this.run.registeredStream.get(streamKey);
                 if(stream) {
                     return new RunningInstStream(this.run, stream);

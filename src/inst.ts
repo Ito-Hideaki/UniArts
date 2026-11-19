@@ -10,6 +10,12 @@ export type MemoryEntry = MemoryKey | {
     keys: (StringObject | NumberEntry)[];
 };
 
+export type StreamEntry = MemoryEntry | {
+    type: "card_stream";
+    card: CardEntry;
+    stream: string;
+};
+
 export type BinaryExpressionType = "+" | "==";
 type BinaryExpression = {
     type: BinaryExpressionType;
@@ -89,7 +95,7 @@ export type EffectType = {
     },
     Call: {
         type: "call";
-        stream: MemoryEntry;
+        stream: StreamEntry;
         params: MemoryKey[];
         saveTo?: MemoryEntry;
     }
@@ -99,7 +105,7 @@ export type Effect = EffectType[keyof EffectType]
 export type ControlType = {
     Jump: {
         type: "jump";
-        stream: MemoryEntry;
+        stream: StreamEntry;
     },
     Return: {
         type: "return";

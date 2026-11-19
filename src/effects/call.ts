@@ -2,7 +2,7 @@ import { RunningEffect } from "./effect";
 import { Run } from "../run";
 import type { EffectType, InstStream, MemoryValue } from "../inst";
 import { RunningInstStream, type CallInfo } from "../instexecutor";
-import { FullMemory } from "../instdecoder";
+import { FullMemory, getStreamKey } from "../instdecoder";
 
 class RunningCallEffect extends RunningEffect {
     subRunning: RunningInstStream;
@@ -49,7 +49,7 @@ class RunningCallEffect extends RunningEffect {
 }
 
 export function executeCallEffect(run: Run, effect: EffectType["Call"], context: RunningInstStream): RunningCallEffect | false {
-    const streamKey = FullMemory.getKeyFromEntry(context.fullMemory, effect.stream);
+    const streamKey = getStreamKey(effect.stream, context.fullMemory, run);
     const stream = run.registeredStream.get(streamKey);
     if(stream) {
         return new RunningCallEffect(effect, stream, context, run);

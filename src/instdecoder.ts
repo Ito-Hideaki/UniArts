@@ -1,6 +1,7 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { BinaryExpressionType, CardEntry, MemoryEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry } from "./inst";
+import type { BinaryExpressionType, CardEntry, MemoryEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry, StreamEntry } from "./inst";
+import type { Run } from "./run";
 
 export type Memory = Map<MemoryKey, MemoryValue>;
 export type FullMemory = {
@@ -131,4 +132,18 @@ export function getNumber(entry: NumberEntry, memory: FullMemory): number {
         case "==":
             return dobinaryOperation(entry.type, getNumber(entry.v1, memory), getNumber(entry.v2, memory));
     }
+}
+
+export function getStreamKey(entry: StreamEntry, memory: FullMemory, run: Run): string {
+    if(typeof entry === "object") {
+        switch(entry.type) {
+            case "card_stream":
+                const card = getCards(entry.card, memory, run.board).at(0);
+                if(!card) throw "error: card to refer stream from was not found";
+                return `${card.info.id}_${entry.stream}`;
+            case "nest":
+        }
+    }
+
+    return FullMemory.getKeyFromEntry(memory, entry);
 }
