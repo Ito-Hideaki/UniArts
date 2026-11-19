@@ -1,6 +1,6 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry, StringEntry } from "./inst";
+import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry } from "./inst";
 import type { Run } from "./run";
 
 export type Memory = Map<MemoryKey, MemoryValue>;
@@ -99,21 +99,6 @@ export function getCards(entry: CardEntry, memory: FullMemory, board: Board): Ca
         case "top":
             const sourceCards = getCards(selector.source, memory, board);
             return sourceCards.slice(-selector.max);
-    }
-}
-
-export function getString(entry: StringEntry, memory: FullMemory, run: Run): string {
-    if(typeof entry === "string") return entry;
-    switch(entry.type) {
-        case "join":
-            return entry.source.map(str => getString(str, memory, run)).join(entry.seperator);
-        case "card_stream":
-            const card = getCards(entry.card, memory, run.board).at(0);
-            if(!card) {
-                throw `error: on card_stream: card was not found`;
-            } else {
-                return `${card.info.id}_${getString(entry.stream, memory, run)}`;
-            }
     }
 }
 

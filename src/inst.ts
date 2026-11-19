@@ -1,15 +1,6 @@
 import type { Card } from "./abstracts/card";
 
-type StringExpression = {
-    type: "join",
-    source: StringEntry[],
-    seperator?: string
-} | {
-    type: "card_stream",
-    card: CardEntry,
-    stream: StringEntry
-};
-export type StringEntry = string | StringExpression;
+export type MemoryEntry = MemoryKey;
 
 export type BinaryExpressionType = "+" | "==";
 type BinaryExpression = {
@@ -67,22 +58,22 @@ export type EffectType = {
     ChooseCard: {
         type: "choose_card";
         target: CardEntry;
-        saveTo: StringEntry;
+        saveTo: MemoryEntry;
     },
     SaveCard: {
         type: "save_card";
         value: CardEntry;
-        key: StringEntry;
+        key: MemoryEntry;
     },
     SaveNumbers: {
         type: "save_numbers";
         value: NumbersEntry;
-        key: StringEntry;
+        key: MemoryEntry;
     },
     SaveNumber: {
         type: "save_num";
         value: NumberEntry;
-        key: StringEntry;
+        key: MemoryEntry;
     },
     Timeout: {
         type: "timeout";
@@ -90,9 +81,9 @@ export type EffectType = {
     },
     Call: {
         type: "call";
-        stream: StringEntry;
+        stream: MemoryEntry;
         params: MemoryKey[];
-        saveTo?: StringEntry;
+        saveTo?: MemoryEntry;
     }
 }
 
@@ -100,7 +91,7 @@ export type Effect = EffectType[keyof EffectType]
 export type ControlType = {
     Jump: {
         type: "jump";
-        stream: StringEntry;
+        stream: MemoryEntry;
     },
     Return: {
         type: "return";
