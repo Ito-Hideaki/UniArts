@@ -1,7 +1,6 @@
 import type { Board } from "./abstracts/board";
 import type { Card } from "./abstracts/card";
-import type { BinaryExpressionType, CardEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry } from "./inst";
-import type { Run } from "./run";
+import type { BinaryExpressionType, CardEntry, MemoryEntry, MemoryKey, MemoryValue, NumberEntry, NumbersEntry } from "./inst";
 
 export type Memory = Map<MemoryKey, MemoryValue>;
 export type FullMemory = {
@@ -9,14 +8,27 @@ export type FullMemory = {
     run: Memory;
 };
 export const FullMemory = {
-    get: function(memory: FullMemory, key: MemoryKey) {
+    getKeyFromEntry(memory: FullMemory, entry: MemoryEntry): MemoryKey {
+        if(typeof entry === "string") return entry;
+        switch(entry.type) {
+            case "nest":
+                return entry.keys.map(keyEntry => {
+                    if(typeof keyEntry === "object" && keyEntry.type === "str") {
+                        return keyEntry.str;
+                    } else return getNumber(keyEntry, memory);
+                }).join(".");
+        }
+    },
+    get: function(memory: FullMemory, keyEntry: MemoryEntry) {
+        const key = FullMemory.getKeyFromEntry(memory, keyEntry);
         if(key.slice(0, 2) === "r.") {
             return memory.run.get(key.slice(2));
         } else {
             return memory.local.get(key);
         }
     },
-    set: function(memory: FullMemory, key: MemoryKey, value: MemoryValue) {
+    set: function(memory: FullMemory, keyEntry: MemoryEntry, value: MemoryValue) {
+        const key = FullMemory.getKeyFromEntry(memory, keyEntry);
         if(key.slice(0, 2) === "r.") {
             return memory.run.set(key.slice(2), value);
         } else {

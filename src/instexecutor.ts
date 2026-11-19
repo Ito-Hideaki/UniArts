@@ -168,7 +168,8 @@ export class RunningInstStream {
     private executeControl(control: Control): RunningInstStream | undefined {
         switch(control.type) {
             case "jump":
-                const stream = this.run.registeredStream.get(control.stream);
+                const streamKey = FullMemory.getKeyFromEntry(this.fullMemory, control.stream);
+                const stream = this.run.registeredStream.get(streamKey);
                 if(stream) {
                     return new RunningInstStream(this.run, stream);
                 } else {

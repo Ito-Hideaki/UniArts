@@ -34,7 +34,7 @@ export const systemStream: { [k: string]: InstStream } = {
         body: [
             { type: "call", stream: "system.deal_hands", params: [] },
             { type: "loop" },
-                { type: "save_num", value: 0, key: "r.current_player" },
+                { type: "save_num", value: 0, key: { type: "nest", keys: [{ type: "str", str: "r" }, { type: "str", str: "current_player" }] } },
                 { type: "loop" },
                     { type: "call", stream: "system.play_from_hands", params: [] },
                     { type: "save_num", key: "r.current_player", value: { type: "+", v1: "r.current_player", v2: 1 }},

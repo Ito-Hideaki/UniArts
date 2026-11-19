@@ -1,6 +1,14 @@
 import type { Card } from "./abstracts/card";
 
-export type MemoryEntry = MemoryKey;
+export type StringObject = {
+    type: "str";
+    str: string;
+};
+
+export type MemoryEntry = MemoryKey | {
+    type: "nest";
+    keys: (StringObject | NumberEntry)[];
+};
 
 export type BinaryExpressionType = "+" | "==";
 type BinaryExpression = {
