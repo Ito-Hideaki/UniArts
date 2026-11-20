@@ -63,7 +63,7 @@ export const systemStream: { [k: string]: InstStream } = {
     },
     play_from_hands: {
         body: [
-            { type: "choose_card", saveTo: "picked", target: {
+            { type: "choose_card", saveTo: "picked", max: 1, target: {
                 type: "pile",
                 pile: {
                     player: "r.current_player",

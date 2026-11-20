@@ -72,6 +72,7 @@ export type EffectType = {
     ChooseCard: {
         type: "choose_card";
         target: CardEntry;
+        max?: NumberEntry;
         saveTo: MemoryEntry;
     },
     SaveCard: {

@@ -4,15 +4,17 @@ import type { Card } from "../abstracts/card";
 import { CardObject, findCardObject } from "../gameobjects/cardobject";
 import type { EffectType } from "../inst";
 import type { RunningInstStream } from "../instexecutor";
-import { FullMemory } from "../instdecoder";
+import { FullMemory, getNumber } from "../instdecoder";
 
 class RunningChooseCardEffect extends RunningEffect {
     submitted = false;
     effect;
+    selectedCardQueue: CardObject[] = [];
     cardObjects;
     context;
     submitCardButton;
     scene;
+    max: number | undefined;
     run;
 
     constructor(run: Run, effect: EffectType["ChooseCard"], context: RunningInstStream, cardObjects: CardObject[]) {
@@ -22,6 +24,7 @@ class RunningChooseCardEffect extends RunningEffect {
         this.context = context;
         this.submitCardButton = run.getUI("submitCardButton");
         this.scene = run.scene;
+        this.max = effect.max !== undefined ? getNumber(effect.max, context.fullMemory) : undefined;
         this.run = run;
 
         for(const cardObject of cardObjects) {
@@ -34,7 +37,24 @@ class RunningChooseCardEffect extends RunningEffect {
     }
 
     onCardClick(cardObject: CardObject) {
-        cardObject.selected = !cardObject.selected;
+
+        const nextSelected = !cardObject.selected;
+        if(nextSelected) {
+            const canAddCard = this.max === undefined || this.max > 0;
+            if(canAddCard) {
+                const selectedQueueIsFull = this.max !== undefined && this.selectedCardQueue.length >= this.max;
+                if(selectedQueueIsFull) {
+                    const unselected = this.selectedCardQueue.splice(0, 1);
+                    unselected[0].selected = false;
+                }
+                cardObject.selected = true;
+                this.selectedCardQueue.push(cardObject);
+            }
+        } else {
+            const index = this.selectedCardQueue.indexOf(cardObject);
+            const unselected = this.selectedCardQueue.splice(index, 1);
+            unselected[0].selected = false;
+        }
     }
 
     onSubmit() {
