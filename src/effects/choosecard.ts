@@ -26,10 +26,15 @@ class RunningChooseCardEffect extends RunningEffect {
 
         for(const cardObject of cardObjects) {
             cardObject.selectable = true;
+            cardObject.on("click", () => { this.onCardClick(cardObject); });
         }
 
         this.submitCardButton.job = "shiyou";
         this.scene.events.on("submit_card_button_click", this.onSubmit, this);
+    }
+
+    onCardClick(cardObject: CardObject) {
+        cardObject.selected = !cardObject.selected;
     }
 
     onSubmit() {

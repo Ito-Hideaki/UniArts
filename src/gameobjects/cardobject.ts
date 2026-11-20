@@ -60,7 +60,7 @@ export class CardObject extends Phaser.GameObjects.Image {
     }
 
     onClick() {
-        this.selected = !this.selected;
+        this.emit("click");
     }
 
     update(_: number, delta_ms: number) {
